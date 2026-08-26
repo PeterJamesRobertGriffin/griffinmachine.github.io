@@ -77,27 +77,25 @@
       border-color: #202020;
     }
 
-/* BACKGROUND CARD BEHIND GENERATE BUTTON */
-.generate-wrapper {
-  background: rgba(20, 20, 20, 0.35);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-
-  padding: 20px 30px;
-  border-radius: 20px;
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-
-  box-shadow:
-    0 0 30px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 10px;
-  width: fit-content;
-}
+    .generate-wrapper {
+      background: rgba(20, 20, 20, 0.35);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      padding: 20px 30px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 0, 0, 0.45);
+      box-shadow: 
+        0 0 30px rgba(0, 0, 0, 0.35), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      width: fit-content;
+      min-width: 280px;
+      box-sizing: border-box;
+    }
 
     .generate-btn-img {
       width: 220px;
@@ -122,37 +120,16 @@
         drop-shadow(0 14px 28px rgba(0, 0, 0, 1));
     }
 
+    /* We keep the pointer active so you can instantly mash or click it again anytime */
     .generate-btn-img.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    .download-btn {
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 8px;
-      background: #0015ff;
-      color: white;
-      border: 2px solid #000;
-      cursor: pointer;
-      margin-top: 15px;
-      text-decoration: none;
-      display: inline-block;
-      transition: background 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 0 2px #000, 0 8px 20px rgba(0, 0, 0, 0.9);
-    }
-
-    .download-btn:hover {
-      background: #6bc4ff;
-      box-shadow: 0 0 0 2px #000, 0 12px 25px rgba(0, 0, 0, 1);
+      opacity: 0.7;
     }
 
     video {
       width: 100%;
       border-radius: 8px;
-      margin-top: 15px;
+      margin-top: 10px;
+      margin-bottom: 10px;
       background: #000;
       display: none;
       box-shadow: 0 0 0 2px #000, 0 12px 28px rgba(0, 0, 0, 0.9);
@@ -171,18 +148,11 @@
          0 4px 10px rgba(0, 0, 0, 1);
     }
 
-    canvas {
-      display: none;
-    }
-
-    .hidden-video-element {
-      position: fixed;
-      top: -9999px;
-      left: -9999px;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
+    #buttonContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
   </style>
 </head>
@@ -213,52 +183,31 @@
       >
     </div>
 
-    <!-- BACKGROUND CARD FOR GENERATE AREA -->
-    <div class="generate-wrapper">
-      <img 
-        id="generateBtn" 
-        src="generate_btn_family_guy.png" 
-        alt="Generate" 
-        class="generate-btn-img" 
-        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'220\' height=\'55\'><rect width=\'220\' height=\'55\' rx=\'8\' fill=\'%23ff4757\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'18\' font-weight=\'bold\'>GENERATE</text></svg>';"
-        onclick="generateAndStitch()"
-      >
-
-      <div id="status">Ready</div>
+    <div id="buttonContainer">
+      <div class="generate-wrapper">
+        <img 
+          id="generateBtn" 
+          src="generate_btn_family_guy.png" 
+          alt="Generate" 
+          class="generate-btn-img" 
+          onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'220\' height=\'55\'><rect width=\'220\' height=\'55\' rx=\'8\' fill=\'%23ff4757\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'18\' font-weight=\'bold\'>GENERATE</text></svg>';"
+          onclick="generateAndStitch()"
+        >
+        <div id="status">Ready</div>
+      </div>
     </div>
 
+    <!-- Video Output Player -->
     <video id="player" controls></video>
-    <br>
-    <a id="downloadBtn" class="download-btn" style="display:none;" download="cutaway.mp4">Download Stitched Video</a>
   </div>
-
-  <canvas id="canvas" width="1280" height="720"></canvas>
-  <video id="tempVideo" class="hidden-video-element" playsinline crossOrigin="anonymous"></video>
 
   <script>
     let currentShow = 'family_guy';
-    let audioCtx = null;
-    let combinedStream = null;
 
-const showLibrary = {
-      family_guy: { 
-        folder: 'family_guy', 
-        startCount: 81, 
-        endCount: 100,
-        buttonImg: 'generate_btn_family_guy.png'
-      },
-      cleveland_show: { 
-        folder: 'cleveland_show', 
-        startCount: 1, 
-        endCount: 1,
-        buttonImg: 'generate_btn_cleveland.png'
-      },
-      bobs_burgers: { 
-        folder: 'bobs_burgers', 
-        startCount: 1, 
-        endCount: 1,
-        buttonImg: 'generate_btn_bobs_burgers.png'
-      }
+    const showLibrary = {
+      family_guy: { folder: 'family_guy', startCount: 81, endCount: 100, buttonImg: 'generate_btn_family_guy.png' },
+      cleveland_show: { folder: 'cleveland_show', startCount: 1, endCount: 1, buttonImg: 'generate_btn_cleveland.png' },
+      bobs_burgers: { folder: 'bobs_burgers', startCount: 1, endCount: 1, buttonImg: 'generate_btn_bobs_burgers.png' }
     };
 
     function selectShow(showKey, element) {
@@ -266,152 +215,40 @@ const showLibrary = {
       document.body.className = showKey;
       document.querySelectorAll('.char-head').forEach(img => img.classList.remove('active'));
       element.classList.add('active');
-
-      // Update button image based on selected show
-      const generateBtn = document.getElementById('generateBtn');
-      generateBtn.src = showLibrary[showKey].buttonImg;
+      document.getElementById('generateBtn').src = showLibrary[showKey].buttonImg;
     }
 
     function getRandomInt(max) {
       return Math.floor(Math.random() * max) + 1;
     }
 
-    function getSupportedMimeType() {
-      const types = [
-        'video/mp4;codecs=avc1',
-        'video/mp4',
-        'video/webm;codecs=h264',
-        'video/webm;codecs=vp8',
-        'video/webm'
-      ];
-      return types.find(type => MediaRecorder.isTypeSupported(type)) || 'video/webm';
-    }
-
-    async function generateAndStitch() {
+    function generateAndStitch() {
       const btn = document.getElementById('generateBtn');
-      const status = document.getElementById('status');
       const player = document.getElementById('player');
-      const downloadBtn = document.getElementById('downloadBtn');
-      const tempVideo = document.getElementById('tempVideo');
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
-
-      btn.classList.add('disabled');
-      downloadBtn.style.display = 'none';
-      player.style.display = 'none';
-      status.innerText = "Processing...";
+      const buttonContainer = document.getElementById('buttonContainer');
+      const container = document.querySelector('.container');
 
       const config = showLibrary[currentShow];
-      const startNum = getRandomInt(config.startCount);
-      const endNum = getRandomInt(config.endCount);
+      const startPath = `clips/${config.folder}/start/S${getRandomInt(config.startCount)}.mp4`;
+      const endPath = `clips/${config.folder}/end/E${getRandomInt(config.endCount)}.mp4`;
 
-      const startPath = `clips/${config.folder}/start/S${startNum}.mp4`;
-      const endPath = `clips/${config.folder}/end/E${endNum}.mp4`;
+      // Instantly reveal player and shift button container under it
+      player.style.display = 'block';
+      container.appendChild(buttonContainer);
+      
+      let playlist = [startPath, endPath];
+      let currentIndex = 0;
 
-      tempVideo.muted = false;
+      player.src = playlist[currentIndex];
+      player.play().catch(err => console.log(err));
 
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const audioDestination = audioCtx.createMediaStreamDestination();
-        const videoSource = audioCtx.createMediaElementSource(tempVideo);
-        
-        videoSource.connect(audioDestination);
-
-        const canvasStream = canvas.captureStream(30);
-        combinedStream = new MediaStream([
-          ...canvasStream.getVideoTracks(),
-          ...audioDestination.stream.getAudioTracks()
-        ]);
-      }
-
-      if (audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-      }
-
-      const drawInterval = setInterval(() => {
-        if (tempVideo.readyState >= 2) {
-          ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+      player.onended = () => {
+        currentIndex++;
+        if (currentIndex < playlist.length) {
+          player.src = playlist[currentIndex];
+          player.play().catch(err => console.log(err));
         }
-      }, 1000 / 30);
-
-      const mimeType = getSupportedMimeType();
-      const extension = mimeType.includes('mp4') ? 'mp4' : 'webm';
-
-      const recorder = new MediaRecorder(combinedStream, { mimeType });
-      const chunks = [];
-
-      recorder.ondataavailable = e => {
-        if (e.data && e.data.size > 0) chunks.push(e.data);
       };
-
-      const playClip = (src) => {
-        return new Promise((resolve, reject) => {
-          tempVideo.removeAttribute('src');
-          tempVideo.load();
-
-          tempVideo.src = src;
-          tempVideo.currentTime = 0;
-
-          const handleEnded = () => {
-            cleanup();
-            resolve();
-          };
-
-          const handleError = () => {
-            cleanup();
-            reject(new Error(`Failed to load clip: ${src}`));
-          };
-
-          function cleanup() {
-            tempVideo.removeEventListener('ended', handleEnded);
-            tempVideo.removeEventListener('error', handleError);
-          }
-
-          tempVideo.addEventListener('ended', handleEnded, { once: true });
-          tempVideo.addEventListener('error', handleError, { once: true });
-
-          tempVideo.play().catch(reject);
-        });
-      };
-
-      try {
-        recorder.start(100);
-
-        await playClip(startPath);
-        await playClip(endPath);
-
-        const stitchedBlob = await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            if (recorder.state === "recording") recorder.stop();
-            reject(new Error("Processing timed out."));
-          }, 30000);
-
-          recorder.onstop = () => {
-            clearTimeout(timeout);
-            resolve(new Blob(chunks, { type: mimeType }));
-          };
-          
-          recorder.stop();
-        });
-
-        clearInterval(drawInterval);
-
-        const stitchedUrl = URL.createObjectURL(stitchedBlob);
-        player.src = stitchedUrl;
-        player.style.display = 'block';
-        player.play();
-
-        downloadBtn.href = stitchedUrl;
-        downloadBtn.download = `cutaway.${extension}`;
-        downloadBtn.style.display = 'inline-block';
-        status.innerText = "";
-      } catch (err) {
-        clearInterval(drawInterval);
-        console.error(err);
-        status.innerText = "Error processing video.";
-      } finally {
-        btn.classList.remove('disabled');
-      }
     }
   </script>
 </body>

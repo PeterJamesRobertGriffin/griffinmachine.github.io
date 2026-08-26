@@ -77,27 +77,25 @@
       border-color: #202020;
     }
 
-/* BACKGROUND CARD BEHIND GENERATE BUTTON */
-.generate-wrapper {
-  background: rgba(20, 20, 20, 0.35);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-
-  padding: 20px 30px;
-  border-radius: 20px;
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-
-  box-shadow:
-    0 0 30px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 10px;
-  width: fit-content;
-}
+    .generate-wrapper {
+      background: rgba(20, 20, 20, 0.35);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      padding: 20px 30px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 0, 0, 0.45);
+      box-shadow: 
+        0 0 30px rgba(0, 0, 0, 0.35), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      width: fit-content;
+      min-width: 280px;
+      box-sizing: border-box;
+    }
 
     .generate-btn-img {
       width: 220px;
@@ -125,34 +123,14 @@
     .generate-btn-img.disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    .download-btn {
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 8px;
-      background: #0015ff;
-      color: white;
-      border: 2px solid #000;
-      cursor: pointer;
-      margin-top: 15px;
-      text-decoration: none;
-      display: inline-block;
-      transition: background 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 0 2px #000, 0 8px 20px rgba(0, 0, 0, 0.9);
-    }
-
-    .download-btn:hover {
-      background: #6bc4ff;
-      box-shadow: 0 0 0 2px #000, 0 12px 25px rgba(0, 0, 0, 1);
+      transform: none !important;
     }
 
     video {
       width: 100%;
       border-radius: 8px;
-      margin-top: 15px;
+      margin-top: 10px;
+      margin-bottom: 10px;
       background: #000;
       display: none;
       box-shadow: 0 0 0 2px #000, 0 12px 28px rgba(0, 0, 0, 0.9);
@@ -171,18 +149,11 @@
          0 4px 10px rgba(0, 0, 0, 1);
     }
 
-    canvas {
-      display: none;
-    }
-
-    .hidden-video-element {
-      position: fixed;
-      top: -9999px;
-      left: -9999px;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
+    #buttonContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
   </style>
 </head>
@@ -194,225 +165,265 @@
         src="clips/family_guy/head.png" 
         alt="Family Guy" 
         class="char-head active" 
-        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'110\' height=\'110\' viewBox=\'0 0 110 110\'><rect width=\'110\' height=\'110\' fill=\'%230074D9\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'24\' font-weight=\'bold\'>FG</text></svg>';"
         onclick="selectShow('family_guy', this)"
       >
       <img 
         src="clips/cleveland_show/head.png" 
         alt="Cleveland Show" 
         class="char-head" 
-        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'110\' height=\'110\' viewBox=\'0 0 110 110\'><rect width=\'110\' height=\'110\' fill=\'%23FFDC00\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'black\' font-family=\'Arial\' font-size=\'24\' font-weight=\'bold\'>CS</text></svg>';"
         onclick="selectShow('cleveland_show', this)"
       >
       <img 
         src="clips/bobs_burgers/head.png" 
         alt="Bob's Burgers" 
         class="char-head" 
-        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'110\' height=\'110\' viewBox=\'0 0 110 110\'><rect width=\'110\' height=\'110\' fill=\'%23A0D468\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'black\' font-family=\'Arial\' font-size=\'24\' font-weight=\'bold\'>BB</text></svg>';"
         onclick="selectShow('bobs_burgers', this)"
       >
     </div>
 
-    <!-- BACKGROUND CARD FOR GENERATE AREA -->
-    <div class="generate-wrapper">
-      <img 
-        id="generateBtn" 
-        src="generate_btn_family_guy.png" 
-        alt="Generate" 
-        class="generate-btn-img" 
-        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'220\' height=\'55\'><rect width=\'220\' height=\'55\' rx=\'8\' fill=\'%23ff4757\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'18\' font-weight=\'bold\'>GENERATE</text></svg>';"
-        onclick="generateAndStitch()"
-      >
-
-      <div id="status">Ready</div>
+    <div id="buttonContainer">
+      <div class="generate-wrapper">
+        <img 
+          id="generateBtn" 
+          src="generate_btn_family_guy.png" 
+          alt="Generate" 
+          class="generate-btn-img" 
+          onclick="playMashup()"
+        >
+        <div id="status"></div>
+      </div>
     </div>
 
-    <video id="player" controls></video>
-    <br>
-    <a id="downloadBtn" class="download-btn" style="display:none;" download="cutaway.mp4">Download Stitched Video</a>
+    <!-- Video Output Player with controls enabled permanently -->
+    <video id="player" controls playsinline></video>
   </div>
 
-  <canvas id="canvas" width="1280" height="720"></canvas>
-  <video id="tempVideo" class="hidden-video-element" playsinline crossOrigin="anonymous"></video>
+<script type="module">
+  import { FFmpeg } from './ffmpeg/lib/index.js';
+  import { fetchFile, toBlobURL } from './ffmpeg/util/index.js';
 
-  <script>
-    let currentShow = 'family_guy';
-    let audioCtx = null;
-    let combinedStream = null;
+  let currentShow = 'family_guy';
+  let ffmpeg = null;
+  let ffmpegLoaded = false;
 
-const showLibrary = {
-      family_guy: { 
-        folder: 'family_guy', 
-        startCount: 81, 
-        endCount: 100,
-        buttonImg: 'generate_btn_family_guy.png'
-      },
-      cleveland_show: { 
-        folder: 'cleveland_show', 
-        startCount: 1, 
-        endCount: 1,
-        buttonImg: 'generate_btn_cleveland.png'
-      },
-      bobs_burgers: { 
-        folder: 'bobs_burgers', 
-        startCount: 1, 
-        endCount: 1,
-        buttonImg: 'generate_btn_bobs_burgers.png'
-      }
-    };
+  const showLibrary = {
+    family_guy: {
+      folder: 'family_guy',
+      startCount: 81,
+      endCount: 100,
+      buttonImg: 'generate_btn_family_guy.png'
+    },
 
-    function selectShow(showKey, element) {
-      currentShow = showKey;
-      document.body.className = showKey;
-      document.querySelectorAll('.char-head').forEach(img => img.classList.remove('active'));
-      element.classList.add('active');
+    cleveland_show: {
+      folder: 'cleveland_show',
+      startCount: 1,
+      endCount: 1,
+      buttonImg: 'generate_btn_cleveland.png'
+    },
 
-      // Update button image based on selected show
-      const generateBtn = document.getElementById('generateBtn');
-      generateBtn.src = showLibrary[showKey].buttonImg;
+    bobs_burgers: {
+      folder: 'bobs_burgers',
+      startCount: 1,
+      endCount: 1,
+      buttonImg: 'generate_btn_bobs_burgers.png'
+    }
+  };
+
+  function selectShow(showKey, element) {
+    currentShow = showKey;
+
+    document.body.className = showKey;
+
+    document.querySelectorAll('.char-head').forEach(img => {
+      img.classList.remove('active');
+    });
+
+    element.classList.add('active');
+
+    document.getElementById('generateBtn').src =
+      showLibrary[showKey].buttonImg;
+  }
+
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max) + 1;
+  }
+
+  async function loadFFmpeg() {
+    if (ffmpegLoaded) {
+      return;
     }
 
-    function getRandomInt(max) {
-      return Math.floor(Math.random() * max) + 1;
-    }
+    const status = document.getElementById('status');
 
-    function getSupportedMimeType() {
-      const types = [
-        'video/mp4;codecs=avc1',
-        'video/mp4',
-        'video/webm;codecs=h264',
-        'video/webm;codecs=vp8',
-        'video/webm'
-      ];
-      return types.find(type => MediaRecorder.isTypeSupported(type)) || 'video/webm';
-    }
+    status.textContent = 'Loading video engine...';
 
-    async function generateAndStitch() {
-      const btn = document.getElementById('generateBtn');
-      const status = document.getElementById('status');
-      const player = document.getElementById('player');
-      const downloadBtn = document.getElementById('downloadBtn');
-      const tempVideo = document.getElementById('tempVideo');
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
+    ffmpeg = new FFmpeg();
 
-      btn.classList.add('disabled');
-      downloadBtn.style.display = 'none';
-      player.style.display = 'none';
-      status.innerText = "Processing...";
+    /*
+     * FFmpeg core files are now hosted locally
+     * by Live Server / GitHub Pages.
+     */
+    const baseURL = './ffmpeg/core';
 
+    const coreURL = await toBlobURL(
+      `${baseURL}/ffmpeg-core.js`,
+      'text/javascript'
+    );
+
+    const wasmURL = await toBlobURL(
+      `${baseURL}/ffmpeg-core.wasm`,
+      'application/wasm'
+    );
+
+    await ffmpeg.load({
+      coreURL,
+      wasmURL
+    });
+
+    ffmpegLoaded = true;
+
+    status.textContent = '';
+  }
+
+  async function playMashup() {
+    const btn = document.getElementById('generateBtn');
+    const player = document.getElementById('player');
+    const status = document.getElementById('status');
+
+    btn.classList.add('disabled');
+    btn.style.pointerEvents = 'none';
+
+    try {
       const config = showLibrary[currentShow];
-      const startNum = getRandomInt(config.startCount);
-      const endNum = getRandomInt(config.endCount);
 
-      const startPath = `clips/${config.folder}/start/S${startNum}.mp4`;
-      const endPath = `clips/${config.folder}/end/E${endNum}.mp4`;
+      /*
+       * Pick random START and END clips.
+       */
+      const startNumber = getRandomInt(config.startCount);
+      const endNumber = getRandomInt(config.endCount);
 
-      tempVideo.muted = false;
+      const startPath =
+        `clips/${config.folder}/start/S${startNumber}.mp4`;
 
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const audioDestination = audioCtx.createMediaStreamDestination();
-        const videoSource = audioCtx.createMediaElementSource(tempVideo);
-        
-        videoSource.connect(audioDestination);
+      const endPath =
+        `clips/${config.folder}/end/E${endNumber}.mp4`;
 
-        const canvasStream = canvas.captureStream(30);
-        combinedStream = new MediaStream([
-          ...canvasStream.getVideoTracks(),
-          ...audioDestination.stream.getAudioTracks()
-        ]);
-      }
+      console.log('Start clip:', startPath);
+      console.log('End clip:', endPath);
 
-      if (audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-      }
+      /*
+       * Load FFmpeg.
+       */
+      await loadFFmpeg();
 
-      const drawInterval = setInterval(() => {
-        if (tempVideo.readyState >= 2) {
-          ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+      status.textContent = 'Downloading clips...';
+
+      /*
+       * Download START clip into FFmpeg.
+       */
+      await ffmpeg.writeFile(
+        'start.mp4',
+        await fetchFile(startPath)
+      );
+
+      /*
+       * Download END clip into FFmpeg.
+       */
+      await ffmpeg.writeFile(
+        'end.mp4',
+        await fetchFile(endPath)
+      );
+
+      status.textContent = 'Merging clips...';
+
+      /*
+       * Tell FFmpeg which files to concatenate.
+       */
+      await ffmpeg.writeFile(
+        'inputs.txt',
+        new TextEncoder().encode(
+          "file 'start.mp4'\n" +
+          "file 'end.mp4'\n"
+        )
+      );
+
+      /*
+       * Merge START + END into ONE MP4.
+       *
+       * No playback switching is happening here.
+       * FFmpeg creates an actual new video file.
+       */
+      await ffmpeg.exec([
+        '-f',
+        'concat',
+        '-safe',
+        '0',
+        '-i',
+        'inputs.txt',
+        '-c',
+        'copy',
+        'merged.mp4'
+      ]);
+
+      status.textContent = 'Preparing video...';
+
+      /*
+       * Read the ONE resulting video.
+       */
+      const data = await ffmpeg.readFile('merged.mp4');
+
+      const blob = new Blob(
+        [data.buffer],
+        {
+          type: 'video/mp4'
         }
-      }, 1000 / 30);
+      );
 
-      const mimeType = getSupportedMimeType();
-      const extension = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      const mergedURL =
+        URL.createObjectURL(blob);
 
-      const recorder = new MediaRecorder(combinedStream, { mimeType });
-      const chunks = [];
+      /*
+       * Give the player the merged file.
+       */
+      player.src = mergedURL;
+      player.style.display = 'block';
 
-      recorder.ondataavailable = e => {
-        if (e.data && e.data.size > 0) chunks.push(e.data);
-      };
-
-      const playClip = (src) => {
-        return new Promise((resolve, reject) => {
-          tempVideo.removeAttribute('src');
-          tempVideo.load();
-
-          tempVideo.src = src;
-          tempVideo.currentTime = 0;
-
-          const handleEnded = () => {
-            cleanup();
-            resolve();
-          };
-
-          const handleError = () => {
-            cleanup();
-            reject(new Error(`Failed to load clip: ${src}`));
-          };
-
-          function cleanup() {
-            tempVideo.removeEventListener('ended', handleEnded);
-            tempVideo.removeEventListener('error', handleError);
-          }
-
-          tempVideo.addEventListener('ended', handleEnded, { once: true });
-          tempVideo.addEventListener('error', handleError, { once: true });
-
-          tempVideo.play().catch(reject);
-        });
-      };
+      player.load();
 
       try {
-        recorder.start(100);
-
-        await playClip(startPath);
-        await playClip(endPath);
-
-        const stitchedBlob = await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            if (recorder.state === "recording") recorder.stop();
-            reject(new Error("Processing timed out."));
-          }, 30000);
-
-          recorder.onstop = () => {
-            clearTimeout(timeout);
-            resolve(new Blob(chunks, { type: mimeType }));
-          };
-          
-          recorder.stop();
-        });
-
-        clearInterval(drawInterval);
-
-        const stitchedUrl = URL.createObjectURL(stitchedBlob);
-        player.src = stitchedUrl;
-        player.style.display = 'block';
-        player.play();
-
-        downloadBtn.href = stitchedUrl;
-        downloadBtn.download = `cutaway.${extension}`;
-        downloadBtn.style.display = 'inline-block';
-        status.innerText = "";
+        await player.play();
       } catch (err) {
-        clearInterval(drawInterval);
-        console.error(err);
-        status.innerText = "Error processing video.";
-      } finally {
-        btn.classList.remove('disabled');
+        console.log(
+          'Autoplay blocked. User interaction required.',
+          err
+        );
       }
+
+      status.textContent = '';
+
+    } catch (error) {
+
+      console.error('FFmpeg error:', error);
+
+      status.textContent =
+        'Error creating video. Check the console.';
+
+    } finally {
+
+      btn.classList.remove('disabled');
+      btn.style.pointerEvents = 'auto';
     }
-  </script>
+  }
+
+  /*
+   * Required because your HTML uses:
+   *
+   * onclick="selectShow(...)"
+   * onclick="playMashup()"
+   */
+  window.selectShow = selectShow;
+  window.playMashup = playMashup;
+
+</script>
 </body>
 </html>

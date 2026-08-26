@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Griffin Machine</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      transition: background 0.8s ease-in-out;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* BACKGROUND THEMES */
+    body.family_guy {
+      background-color: #0074D9;
+      background-image: url('images/bg_family_guy.jpg');
+    }
+
+    body.cleveland_show {
+      background-color: #FFDC00;
+      color: #111;
+      background-image: url('images/bg_cleveland.jpg');
+    }
+
+    body.bobs_burgers {
+      background-color: #A0D468;
+      color: #111;
+      background-image: url('images/bg_bobs_burgers.jpg');
+    }
+
+    .container {
+      background: transparent;
+      padding: 30px;
+      text-align: center;
+      color: #fff;
+      max-width: 500px;
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .character-select {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .char-head {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+      border: 5px solid transparent;
+      transition: transform 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
+      background: #333;
+      filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.9)) drop-shadow(0 8px 16px rgba(0, 0, 0, 1));
+    }
+
+    .char-head:hover {
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 14px rgba(0, 0, 0, 1)) drop-shadow(0 12px 24px rgba(0, 0, 0, 1));
+    }
+
+    .char-head.active {
+      border-color: #202020;
+    }
+
+/* BACKGROUND CARD BEHIND GENERATE BUTTON */
+.generate-wrapper {
+  background: rgba(20, 20, 20, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+
+  padding: 20px 30px;
+  border-radius: 20px;
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  box-shadow:
+    0 0 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+    .generate-btn-img {
+      width: 220px;
+      height: auto;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+      filter: 
+        drop-shadow(2px 0 0 #000) 
+        drop-shadow(-2px 0 0 #000) 
+        drop-shadow(0 2px 0 #000) 
+        drop-shadow(0 -2px 0 #000)
+        drop-shadow(0 10px 20px rgba(0, 0, 0, 0.95));
+    }
+
+    .generate-btn-img:hover {
+      transform: scale(1.05);
+      filter: 
+        drop-shadow(3px 0 0 #000) 
+        drop-shadow(-3px 0 0 #000) 
+        drop-shadow(0 3px 0 #000) 
+        drop-shadow(0 -3px 0 #000)
+        drop-shadow(0 14px 28px rgba(0, 0, 0, 1));
+    }
+
+    .generate-btn-img.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .download-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      background: #0015ff;
+      color: white;
+      border: 2px solid #000;
+      cursor: pointer;
+      margin-top: 15px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 0 2px #000, 0 8px 20px rgba(0, 0, 0, 0.9);
+    }
+
+    .download-btn:hover {
+      background: #6bc4ff;
+      box-shadow: 0 0 0 2px #000, 0 12px 25px rgba(0, 0, 0, 1);
+    }
+
+    video {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 15px;
+      background: #000;
+      display: none;
+      box-shadow: 0 0 0 2px #000, 0 12px 28px rgba(0, 0, 0, 0.9);
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 
+        -1.5px -1.5px 0 #000,  
+         1.5px -1.5px 0 #000,
+        -1.5px  1.5px 0 #000,
+         1.5px  1.5px 0 #000,
+         0 4px 10px rgba(0, 0, 0, 1);
+    }
+
+    canvas {
+      display: none;
+    }
+
+    .hidden-video-element {
+      position: fixed;
+      top: -9999px;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="family_guy">
+
+  <div class="container">
+    <div class="character-select">
+      <img 
+        src="clips/family_guy/head.png" 
+        alt="Family Guy" 
+        class="char-head active" 
+        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'110\' height=\'110\' viewBox=\'0 0 110 110\'><rect width=\'110\' height=\'110\' fill=\'%230074D9\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'24\' font-weight=\'bold\'>FG</text></svg>';"
+        onclick="selectShow('family_guy', this)"
+      >
+      <img 
+        src="clips/cleveland_show/head.png" 
+        alt="Cleveland Show" 
+        class="char-head" 
+        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'110\' height=\'110\' viewBox=\'0 0 110 110\'><rect width=\'110\' height=\'110\' fill=\'%23FFDC00\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'black\' font-family=\'Arial\' font-size=\'24\' font-weight=\'bold\'>CS</text></svg>';"
+        onclick="selectShow('cleveland_show', this)"
+      >
+      <img 
+        src="clips/bobs_burgers/head.png" 
+        alt="Bob's Burgers" 
+        class="char-head" 
+        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'110\' height=\'110\' viewBox=\'0 0 110 110\'><rect width=\'110\' height=\'110\' fill=\'%23A0D468\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'black\' font-family=\'Arial\' font-size=\'24\' font-weight=\'bold\'>BB</text></svg>';"
+        onclick="selectShow('bobs_burgers', this)"
+      >
+    </div>
+
+    <!-- BACKGROUND CARD FOR GENERATE AREA -->
+    <div class="generate-wrapper">
+      <img 
+        id="generateBtn" 
+        src="generate_btn_family_guy.png" 
+        alt="Generate" 
+        class="generate-btn-img" 
+        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'220\' height=\'55\'><rect width=\'220\' height=\'55\' rx=\'8\' fill=\'%23ff4757\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'18\' font-weight=\'bold\'>GENERATE</text></svg>';"
+        onclick="generateAndStitch()"
+      >
+
+      <div id="status">Ready</div>
+    </div>
+
+    <video id="player" controls></video>
+    <br>
+    <a id="downloadBtn" class="download-btn" style="display:none;" download="cutaway.mp4">Download Stitched Video</a>
+  </div>
+
+  <canvas id="canvas" width="1280" height="720"></canvas>
+  <video id="tempVideo" class="hidden-video-element" playsinline crossOrigin="anonymous"></video>
+
+  <script>
+    let currentShow = 'family_guy';
+    let audioCtx = null;
+    let combinedStream = null;
+
+const showLibrary = {
+      family_guy: { 
+        folder: 'family_guy', 
+        startCount: 81, 
+        endCount: 100,
+        buttonImg: 'generate_btn_family_guy.png'
+      },
+      cleveland_show: { 
+        folder: 'cleveland_show', 
+        startCount: 1, 
+        endCount: 1,
+        buttonImg: 'generate_btn_cleveland.png'
+      },
+      bobs_burgers: { 
+        folder: 'bobs_burgers', 
+        startCount: 1, 
+        endCount: 1,
+        buttonImg: 'generate_btn_bobs_burgers.png'
+      }
+    };
+
+    function selectShow(showKey, element) {
+      currentShow = showKey;
+      document.body.className = showKey;
+      document.querySelectorAll('.char-head').forEach(img => img.classList.remove('active'));
+      element.classList.add('active');
+
+      // Update button image based on selected show
+      const generateBtn = document.getElementById('generateBtn');
+      generateBtn.src = showLibrary[showKey].buttonImg;
+    }
+
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * max) + 1;
+    }
+
+    function getSupportedMimeType() {
+      const types = [
+        'video/mp4;codecs=avc1',
+        'video/mp4',
+        'video/webm;codecs=h264',
+        'video/webm;codecs=vp8',
+        'video/webm'
+      ];
+      return types.find(type => MediaRecorder.isTypeSupported(type)) || 'video/webm';
+    }
+
+    async function generateAndStitch() {
+      const btn = document.getElementById('generateBtn');
+      const status = document.getElementById('status');
+      const player = document.getElementById('player');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const tempVideo = document.getElementById('tempVideo');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      btn.classList.add('disabled');
+      downloadBtn.style.display = 'none';
+      player.style.display = 'none';
+      status.innerText = "Processing...";
+
+      const config = showLibrary[currentShow];
+      const startNum = getRandomInt(config.startCount);
+      const endNum = getRandomInt(config.endCount);
+
+      const startPath = `clips/${config.folder}/start/S${startNum}.mp4`;
+      const endPath = `clips/${config.folder}/end/E${endNum}.mp4`;
+
+      tempVideo.muted = false;
+
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const audioDestination = audioCtx.createMediaStreamDestination();
+        const videoSource = audioCtx.createMediaElementSource(tempVideo);
+        
+        videoSource.connect(audioDestination);
+
+        const canvasStream = canvas.captureStream(30);
+        combinedStream = new MediaStream([
+          ...canvasStream.getVideoTracks(),
+          ...audioDestination.stream.getAudioTracks()
+        ]);
+      }
+
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
+      const drawInterval = setInterval(() => {
+        if (tempVideo.readyState >= 2) {
+          ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+        }
+      }, 1000 / 30);
+
+      const mimeType = getSupportedMimeType();
+      const extension = mimeType.includes('mp4') ? 'mp4' : 'webm';
+
+      const recorder = new MediaRecorder(combinedStream, { mimeType });
+      const chunks = [];
+
+      recorder.ondataavailable = e => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+
+      const playClip = (src) => {
+        return new Promise((resolve, reject) => {
+          tempVideo.removeAttribute('src');
+          tempVideo.load();
+
+          tempVideo.src = src;
+          tempVideo.currentTime = 0;
+
+          const handleEnded = () => {
+            cleanup();
+            resolve();
+          };
+
+          const handleError = () => {
+            cleanup();
+            reject(new Error(`Failed to load clip: ${src}`));
+          };
+
+          function cleanup() {
+            tempVideo.removeEventListener('ended', handleEnded);
+            tempVideo.removeEventListener('error', handleError);
+          }
+
+          tempVideo.addEventListener('ended', handleEnded, { once: true });
+          tempVideo.addEventListener('error', handleError, { once: true });
+
+          tempVideo.play().catch(reject);
+        });
+      };
+
+      try {
+        recorder.start(100);
+
+        await playClip(startPath);
+        await playClip(endPath);
+
+        const stitchedBlob = await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            if (recorder.state === "recording") recorder.stop();
+            reject(new Error("Processing timed out."));
+          }, 30000);
+
+          recorder.onstop = () => {
+            clearTimeout(timeout);
+            resolve(new Blob(chunks, { type: mimeType }));
+          };
+          
+          recorder.stop();
+        });
+
+        clearInterval(drawInterval);
+
+        const stitchedUrl = URL.createObjectURL(stitchedBlob);
+        player.src = stitchedUrl;
+        player.style.display = 'block';
+        player.play();
+
+        downloadBtn.href = stitchedUrl;
+        downloadBtn.download = `cutaway.${extension}`;
+        downloadBtn.style.display = 'inline-block';
+        status.innerText = "";
+      } catch (err) {
+        clearInterval(drawInterval);
+        console.error(err);
+        status.innerText = "Error processing video.";
+      } finally {
+        btn.classList.remove('disabled');
+      }
+    }
+  </script>
+</body>
+</html>

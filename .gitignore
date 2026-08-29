@@ -1,2 +1,5 @@
 .env
+rarity_controller.py
+__pycache__/
+*.py[cod]
 node_modules/

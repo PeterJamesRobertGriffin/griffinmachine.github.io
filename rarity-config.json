@@ -1,0 +1,6 @@
+{
+  "family_guy": {
+    "rareChance": 0.0,
+    "description": "Set to 1 to always play R1.mp4; set to 0 to never play it. Other values currently use normal clips."
+  }
+}

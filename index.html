@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Griffin Machine</title>
+
   <style>
+    /* =========================================================
+       BASE
+    ========================================================= */
+
     body {
       font-family: Arial, sans-serif;
       color: #fff;
@@ -14,108 +20,559 @@
       min-height: 100vh;
       margin: 0;
       transition: background 0.8s ease-in-out;
+
+      /* Keep zoom-to-fit, but anchor the image to the bottom */
       background-size: cover;
-      background-position: center;
+      background-position: center bottom;
       background-repeat: no-repeat;
+
+      overflow-x: hidden;
     }
 
-    /* BACKGROUND THEMES */
+    /* =========================================================
+       NORMAL BACKGROUNDS
+    ========================================================= */
+
     body.family_guy {
       background-color: #0074D9;
-      background-image: url('images/bg_family_guy.jpg');
+      background-image: url("images/bg_family_guy.jpg");
+      background-position: center bottom;
     }
 
     body.cleveland_show {
       background-color: #FFDC00;
       color: #111;
-      background-image: url('images/bg_cleveland.jpg');
+      background-image: url("images/bg_cleveland.jpg");
+      background-position: center bottom;
     }
 
-    body.bobs_burgers {
-      background-color: #A0D468;
+    body.custom {
+      background-color: #005c22;
       color: #111;
-      background-image: url('images/bg_bobs_burgers.jpg');
+      background-image: url("images/bg_custom.jpg");
+      background-position: center bottom;
     }
+
+    /* =========================================================
+       RETEP BACKGROUND
+    ========================================================= */
+
+    body.retep {
+      background-color: #000;
+
+      background-image:
+        linear-gradient(
+          rgba(0, 0, 0, 0.25),
+          rgba(0, 0, 0, 0.25)
+        ),
+        url("images/bg_retep.jpg");
+
+      background-size: cover;
+      background-position: center bottom;
+      background-repeat: no-repeat;
+
+      animation:
+        retepBackgroundShake 0.08s infinite,
+        retepBackgroundFlicker 0.13s infinite alternate;
+    }
+
+    @keyframes retepBackgroundShake {
+      0% {
+        background-position: calc(50% - 3px) calc(100% + 2px);
+      }
+
+      20% {
+        background-position: calc(50% + 4px) calc(100% - 3px);
+      }
+
+      40% {
+        background-position: calc(50% - 5px) calc(100% + 4px);
+      }
+
+      60% {
+        background-position: calc(50% + 3px) calc(100% + 5px);
+      }
+
+      80% {
+        background-position: calc(50% - 4px) calc(100% - 2px);
+      }
+
+      100% {
+        background-position: calc(50% + 2px) calc(100% + 3px);
+      }
+    }
+
+    @keyframes retepBackgroundFlicker {
+      0% {
+        filter: brightness(0.75) contrast(1.15) saturate(1.1);
+      }
+
+      10% {
+        filter: brightness(1.05) contrast(1.5) saturate(1.6);
+      }
+
+      11% {
+        filter: brightness(0.3) contrast(2) saturate(2);
+      }
+
+      22% {
+        filter: brightness(0.85) contrast(1.3) saturate(1.3);
+      }
+
+      34% {
+        filter: brightness(1.15) contrast(1.7) saturate(1.8);
+      }
+
+      35% {
+        filter: brightness(0.2) contrast(2.2) saturate(2);
+      }
+
+      50% {
+        filter: brightness(0.8) contrast(1.4) saturate(1.5);
+      }
+
+      63% {
+        filter: brightness(1.1) contrast(1.7) saturate(1.8);
+      }
+
+      64% {
+        filter: brightness(0.35) contrast(2) saturate(2);
+      }
+
+      80% {
+        filter: brightness(0.7) contrast(1.4) saturate(1.5);
+      }
+
+      100% {
+        filter: brightness(0.6) contrast(1.5) saturate(1.6);
+      }
+    }
+
+    /* =========================================================
+       LOGO
+       50% larger than the previous logo size.
+    ========================================================= */
+
+    #siteLogo {
+      width: 507px;
+      max-width: 63vw;
+      height: auto;
+
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      z-index: 20;
+      pointer-events: none;
+
+      filter:
+        drop-shadow(0 5px 10px rgba(0, 0, 0, 0.9))
+        drop-shadow(0 0 15px rgba(0, 0, 0, 0.6));
+
+      transition:
+        opacity 0.25s ease,
+        filter 0.25s ease;
+    }
+
+    body.retep #siteLogo {
+      animation: retepLogoGlitch 0.1s infinite alternate;
+    }
+
+    @keyframes retepLogoGlitch {
+      from {
+        transform: translateX(calc(-50% - 2px)) skewX(-1deg);
+      }
+
+      to {
+        transform: translateX(calc(-50% + 2px)) skewX(1deg);
+      }
+    }
+
+    /* =========================================================
+       MAIN CONTAINER
+    ========================================================= */
 
     .container {
       background: transparent;
-      padding: 30px;
+      padding: 160px 30px 20px;
       text-align: center;
       color: #fff;
-      max-width: 500px;
-      width: 90%;
+
+      max-width: 540px;
+      width: 92%;
+
       display: flex;
       flex-direction: column;
       align-items: center;
+
+      position: relative;
+      z-index: 5;
     }
 
+    /* =========================================================
+       CHARACTER SELECT
+    ========================================================= */
+
     .character-select {
+      position: fixed;
+
+      left: 25px;
+      right: auto;
+      top: 50%;
+
+      transform: translateY(-50%);
+
       display: flex;
+      flex-direction: column;
+
       justify-content: center;
+      align-items: flex-start;
+
       gap: 20px;
-      margin-bottom: 25px;
+
+      margin: 0;
+
+      z-index: 15;
+
+      /*
+        Important:
+        The container itself NEVER moves.
+        Individual characters move independently.
+        This prevents the tiny layout glitch.
+      */
+      pointer-events: none;
     }
 
     .char-head {
       width: 110px;
       height: 110px;
+
+      flex-shrink: 0;
+
       border-radius: 50%;
+
       object-fit: cover;
+
       cursor: pointer;
-      border: 5px solid transparent;
-      transition: transform 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
-      background: #333;
-      filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.9)) drop-shadow(0 8px 16px rgba(0, 0, 0, 1));
+
+      pointer-events: auto;
+
+      border: 1px solid rgba(0, 0, 0, 0.45);
+
+      background: rgba(20, 20, 20, 0.083);
+
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+
+      filter:
+        drop-shadow(0 0 10px rgba(0, 0, 0, 0.364))
+        drop-shadow(0 8px 16px rgba(0, 0, 0, 1));
+
+      /*
+        No transition on transform here.
+        CSS animations control all movement.
+      */
+      transition:
+        border-color 0.3s ease,
+        filter 0.3s ease;
+
+      opacity: 1;
     }
 
     .char-head:hover {
       transform: scale(1.15);
-      filter: drop-shadow(0 0 14px rgba(0, 0, 0, 1)) drop-shadow(0 12px 24px rgba(0, 0, 0, 1));
+      filter:
+        drop-shadow(0 0 14px rgba(0, 0, 0, 1))
+        drop-shadow(0 12px 24px rgba(0, 0, 0, 1));
     }
 
     .char-head.active {
-      border-color: #202020;
+      border-color: rgba(255, 255, 255, 0.8);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.35),
+        0 0 12px rgba(255, 255, 255, 0.28),
+        0 0 22px rgba(255, 255, 255, 0.18);
+      filter:
+        drop-shadow(0 0 10px rgba(0, 0, 0, 0.364))
+        drop-shadow(0 0 18px rgba(255, 255, 255, 0.32))
+        drop-shadow(0 8px 16px rgba(0, 0, 0, 1));
     }
+
+    /* =========================================================
+       CHARACTER SLIDE SYSTEM
+
+       LEFT SIDE:
+       - Griffin icons enter from LEFT
+       - Cleveland icons leave to LEFT
+
+       RIGHT SIDE:
+       - Cleveland icons enter from RIGHT
+       - Griffin icons leave to RIGHT
+    ========================================================= */
+
+    .character-select.side-right {
+      left: auto;
+      right: 25px;
+    }
+
+    .character-select.transitioning {
+      pointer-events: none;
+    }
+
+    /*
+      During transition the icons are individually animated.
+      Each gets a different delay.
+    */
+
+    /* -------------------------
+       ENTER FROM LEFT
+    ------------------------- */
+
+    .character-select.enter-left .char-head {
+      animation-name: characterEnterLeft;
+      animation-duration: 0.48s;
+      animation-timing-function: cubic-bezier(0.2, 0.9, 0.25, 1);
+      animation-fill-mode: both;
+    }
+
+    .character-select.enter-left .char-head:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .character-select.enter-left .char-head:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+    .character-select.enter-left .char-head:nth-child(3) {
+      animation-delay: 0.24s;
+    }
+
+    @keyframes characterEnterLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-140vw) scale(0.8);
+      }
+
+      70% {
+        opacity: 1;
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    /* -------------------------
+       ENTER FROM RIGHT
+    ------------------------- */
+
+    .character-select.enter-right .char-head {
+      animation-name: characterEnterRight;
+      animation-duration: 0.48s;
+      animation-timing-function: cubic-bezier(0.2, 0.9, 0.25, 1);
+      animation-fill-mode: both;
+    }
+
+    .character-select.enter-right .char-head:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .character-select.enter-right .char-head:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+    .character-select.enter-right .char-head:nth-child(3) {
+      animation-delay: 0.24s;
+    }
+
+    @keyframes characterEnterRight {
+      from {
+        opacity: 0;
+        transform: translateX(140vw) scale(0.8);
+      }
+
+      70% {
+        opacity: 1;
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    /* -------------------------
+       EXIT TO LEFT
+    ------------------------- */
+
+    .character-select.exit-left .char-head {
+      animation-name: characterExitLeft;
+      animation-duration: 0.38s;
+      animation-timing-function: cubic-bezier(0.65, 0, 0.85, 0.2);
+      animation-fill-mode: forwards;
+    }
+
+    .character-select.exit-left .char-head:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .character-select.exit-left .char-head:nth-child(2) {
+      animation-delay: 0.08s;
+    }
+
+    .character-select.exit-left .char-head:nth-child(3) {
+      animation-delay: 0.16s;
+    }
+
+    @keyframes characterExitLeft {
+      from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateX(-140vw) scale(0.8);
+      }
+    }
+
+    /* -------------------------
+       EXIT TO RIGHT
+    ------------------------- */
+
+    .character-select.exit-right .char-head {
+      animation-name: characterExitRight;
+      animation-duration: 0.38s;
+      animation-timing-function: cubic-bezier(0.65, 0, 0.85, 0.2);
+      animation-fill-mode: forwards;
+    }
+
+    .character-select.exit-right .char-head:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .character-select.exit-right .char-head:nth-child(2) {
+      animation-delay: 0.08s;
+    }
+
+    .character-select.exit-right .char-head:nth-child(3) {
+      animation-delay: 0.16s;
+    }
+
+    @keyframes characterExitRight {
+      from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateX(140vw) scale(0.8);
+      }
+    }
+
+    /*
+      While waiting between exit and entry, keep the icons
+      completely invisible. This is the fix for the tiny glitch.
+    */
+
+    .character-select.hidden-for-transition .char-head {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      animation: none !important;
+      transform: none !important;
+    }
+
+    /* =========================================================
+       RETEP HEAD
+    ========================================================= */
+
+    body.retep .char-head {
+      border-color: #650000;
+
+      animation:
+        retepHead 0.15s infinite alternate;
+
+      filter:
+        drop-shadow(0 0 12px rgba(255, 0, 0, 0.8))
+        drop-shadow(0 8px 20px rgba(0, 0, 0, 1));
+    }
+
+    @keyframes retepHead {
+      from {
+        transform: translateX(-2px) rotate(-1deg);
+      }
+
+      to {
+        transform: translateX(2px) rotate(1deg);
+      }
+    }
+
+    /* =========================================================
+       GENERATE WRAPPER
+    ========================================================= */
 
     .generate-wrapper {
       background: rgba(20, 20, 20, 0.35);
+
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
+
       padding: 20px 30px;
+
       border-radius: 20px;
+
       border: 1px solid rgba(0, 0, 0, 0.45);
-      box-shadow: 
-        0 0 30px rgba(0, 0, 0, 0.35), 
+
+      box-shadow:
+        0 0 30px rgba(0, 0, 0, 0.35),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
       display: flex;
       flex-direction: column;
       align-items: center;
+
       margin-top: 10px;
       margin-bottom: 10px;
+
       width: fit-content;
       min-width: 280px;
+
       box-sizing: border-box;
     }
+
+    /* =========================================================
+       GENERATE BUTTON
+    ========================================================= */
 
     .generate-btn-img {
       width: 220px;
       height: auto;
+
       cursor: pointer;
-      transition: transform 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
-      filter: 
-        drop-shadow(2px 0 0 #000) 
-        drop-shadow(-2px 0 0 #000) 
-        drop-shadow(0 2px 0 #000) 
+
+      transition:
+        transform 0.2s ease,
+        opacity 0.2s ease,
+        filter 0.2s ease;
+
+      filter:
+        drop-shadow(2px 0 0 #000)
+        drop-shadow(-2px 0 0 #000)
+        drop-shadow(0 2px 0 #000)
         drop-shadow(0 -2px 0 #000)
         drop-shadow(0 10px 20px rgba(0, 0, 0, 0.95));
     }
 
     .generate-btn-img:hover {
       transform: scale(1.05);
-      filter: 
-        drop-shadow(3px 0 0 #000) 
-        drop-shadow(-3px 0 0 #000) 
-        drop-shadow(0 3px 0 #000) 
+
+      filter:
+        drop-shadow(3px 0 0 #000)
+        drop-shadow(-3px 0 0 #000)
+        drop-shadow(0 3px 0 #000)
         drop-shadow(0 -3px 0 #000)
         drop-shadow(0 14px 28px rgba(0, 0, 0, 1));
     }
@@ -126,27 +583,66 @@
       transform: none !important;
     }
 
+    /* =========================================================
+       VIDEO
+    ========================================================= */
+
     video {
-      width: 100%;
+      width: 110%;
+      max-width: 520px;
+
       border-radius: 8px;
-      margin-top: 10px;
-      margin-bottom: 10px;
+
+      margin-top: 0;
+      margin-bottom: 2px;
+
       background: #000;
+
       display: none;
-      box-shadow: 0 0 0 2px #000, 0 12px 28px rgba(0, 0, 0, 0.9);
+
+      order: 1;
+
+      box-shadow:
+        0 0 0 2px #000,
+        0 12px 28px rgba(0, 0, 0, 0.9);
     }
+
+    /* =========================================================
+       STATUS
+    ========================================================= */
 
     #status {
       margin-top: 10px;
+
       font-size: 16px;
       font-weight: bold;
+
       color: #fff;
-      text-shadow: 
-        -1.5px -1.5px 0 #000,  
-         1.5px -1.5px 0 #000,
-        -1.5px  1.5px 0 #000,
-         1.5px  1.5px 0 #000,
-         0 4px 10px rgba(0, 0, 0, 1);
+
+      text-shadow:
+        -1.5px -1.5px 0 #000,
+        1.5px -1.5px 0 #000,
+        -1.5px 1.5px 0 #000,
+        1.5px 1.5px 0 #000,
+        0 4px 10px rgba(0, 0, 0, 1);
+    }
+
+    #retepProgress {
+      display: none;
+
+      margin-top: 8px;
+
+      font-size: 14px;
+      font-weight: bold;
+
+      color: #fff;
+
+      text-shadow:
+        -1.5px -1.5px 0 #000,
+        1.5px -1.5px 0 #000,
+        -1.5px 1.5px 0 #000,
+        1.5px 1.5px 0 #000,
+        0 4px 10px rgba(0, 0, 0, 1);
     }
 
     #buttonContainer {
@@ -154,276 +650,1857 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
+      position: relative;
+      order: 2;
+      margin-top: 2px;
+      transition: margin-top 0.2s ease;
+    }
+
+    #buttonContainer.video-visible {
+      margin-top: 2px;
+    }
+
+    .generate-wrapper {
+      position: relative;
+    }
+
+    /* =========================================================
+       FAKE ERROR
+    ========================================================= */
+
+    #evilError {
+      display: none;
+
+      margin-top: 12px;
+
+      max-width: 340px;
+
+      font-family: monospace;
+
+      font-size: 13px;
+      line-height: 1.5;
+
+      color: #ff4444;
+
+      text-shadow:
+        0 0 5px #ff0000,
+        0 0 10px rgba(255, 0, 0, 0.5);
+
+      user-select: none;
+    }
+
+    .evil-letter {
+      cursor: pointer;
+
+      font-weight: normal;
+
+      color: #ff0000;
+
+      text-shadow:
+        0 0 5px #ff0000,
+        0 0 12px #ff0000;
+
+      transition:
+        color 0.15s ease,
+        text-shadow 0.15s ease,
+        transform 0.15s ease;
+    }
+
+    .evil-letter:hover {
+      color: #fff;
+
+      text-shadow:
+        0 0 8px #fff,
+        0 0 18px #ff0000;
+
+      transform: scale(1.25);
+
+      display: inline-block;
+    }
+
+    #evilError.complete {
+      animation: errorGlitch 0.08s infinite alternate;
+    }
+
+    @keyframes errorGlitch {
+      from {
+        transform: translateX(-2px);
+      }
+
+      to {
+        transform: translateX(2px);
+      }
+    }
+
+    /* =========================================================
+       RETEP MESSAGE
+    ========================================================= */
+
+    #evilMessage {
+      display: none;
+
+      margin-top: 12px;
+
+      color: #ff0000;
+
+      font-family: monospace;
+      font-weight: 900;
+
+      font-size: 18px;
+
+      text-shadow:
+        0 0 5px #ff0000,
+        0 0 15px #ff0000,
+        0 0 30px #000;
+
+      animation: evilText 0.08s infinite alternate;
+    }
+
+    @keyframes evilText {
+      from {
+        transform: translateX(-1px);
+      }
+
+      to {
+        transform: translateX(2px);
+      }
+    }
+
+    /* =========================================================
+       RETEP POPUPS
+    ========================================================= */
+
+    #popupContainer {
+      position: fixed;
+
+      inset: 0;
+
+      width: 100vw;
+      height: 100vh;
+
+      pointer-events: none;
+
+      z-index: 1000;
+
+      overflow: hidden;
+    }
+
+    .retep-popup {
+      position: absolute;
+
+      width: 260px;
+
+      background: #d9d9d9;
+
+      border: 2px solid #111;
+
+      box-shadow:
+        6px 6px 0 rgba(0, 0, 0, 0.75),
+        0 0 25px rgba(255, 0, 0, 0.35);
+
+      animation:
+        popupAppear 0.15s ease-out,
+        popupShake 0.12s infinite alternate;
+
+      pointer-events: none;
+    }
+
+    .popup-titlebar {
+      height: 25px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 6px;
+
+      box-sizing: border-box;
+
+      background: #111;
+
+      color: #fff;
+
+      font-family: Arial, sans-serif;
+
+      font-size: 12px;
+      font-weight: bold;
+
+      border-bottom: 2px solid #000;
+    }
+
+    .popup-buttons {
+      display: flex;
+      gap: 3px;
+    }
+
+    .popup-button {
+      width: 14px;
+      height: 14px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #777;
+
+      color: #fff;
+
+      border: 1px solid #000;
+
+      font-size: 9px;
+      line-height: 1;
+    }
+
+    .popup-body {
+      padding: 8px;
+
+      background: #222;
+
+      color: #fff;
+
+      font-family: monospace;
+
+      font-size: 10px;
+
+      text-align: left;
+    }
+
+    .popup-image {
+      width: 100%;
+      height: auto;
+
+      display: block;
+
+      margin-bottom: 7px;
+
+      border: 1px solid #000;
+    }
+
+    .popup-text {
+      color: #ff3333;
+
+      text-shadow:
+        0 0 5px #ff0000;
+
+      word-break: break-word;
+    }
+
+    @keyframes popupAppear {
+      0% {
+        opacity: 0;
+
+        transform:
+          scale(0.4)
+          rotate(-8deg);
+      }
+
+      70% {
+        opacity: 1;
+
+        transform:
+          scale(1.05)
+          rotate(2deg);
+      }
+
+      100% {
+        opacity: 1;
+
+        transform:
+          scale(1)
+          rotate(0deg);
+      }
+    }
+
+    @keyframes popupShake {
+      from {
+        margin-left: -1px;
+      }
+
+      to {
+        margin-left: 1px;
+      }
+    }
+
+    .retep-popup.removing {
+      animation:
+        popupDisappear 0.2s ease-in forwards;
+    }
+
+    @keyframes popupDisappear {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      to {
+        opacity: 0;
+
+        transform:
+          scale(0.2)
+          rotate(10deg);
+      }
+    }
+
+    /* =========================================================
+       RETEP STATIC
+    ========================================================= */
+
+    body.retep::after {
+      content: "";
+
+      position: fixed;
+
+      inset: 0;
+
+      pointer-events: none;
+
+      z-index: 2;
+
+      opacity: 0.16;
+
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,0.06) 0px,
+          rgba(255,255,255,0.06) 1px,
+          rgba(0,0,0,0.1) 1px,
+          rgba(0,0,0,0.1) 3px
+        );
+
+      animation:
+        staticLines 0.06s steps(2) infinite;
+    }
+
+    @keyframes staticLines {
+      0% {
+        transform: translateY(0);
+      }
+
+      25% {
+        transform: translateY(3px);
+      }
+
+      50% {
+        transform: translateY(-2px);
+      }
+
+      75% {
+        transform: translateY(1px);
+      }
+
+      100% {
+        transform: translateY(-3px);
+      }
+    }
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @media (max-width: 700px) {
+      #siteLogo {
+        width: 390px;
+        max-width: 60vw;
+      }
+
+      .character-select {
+        left: 12px;
+        right: auto;
+        gap: 12px;
+      }
+
+      .character-select.side-right {
+        left: auto;
+        right: 12px;
+      }
+
+      .char-head {
+        width: 75px;
+        height: 75px;
+      }
     }
   </style>
 </head>
+
 <body class="family_guy">
 
+  <!-- =========================================================
+       LOGO
+  ========================================================= -->
+
+  <img
+    id="siteLogo"
+    src="logo.png"
+    alt="The Griffin Machine"
+  >
+
+  <!-- =========================================================
+       MAIN
+  ========================================================= -->
+
   <div class="container">
-    <div class="character-select">
-      <img 
-        src="clips/family_guy/head.png" 
-        alt="Family Guy" 
-        class="char-head active" 
+
+    <!-- CHARACTER SELECT -->
+
+    <div
+      class="character-select"
+      id="characterSelect"
+    >
+
+      <img
+        id="head-family"
+        src="clips/family_guy/head.png"
+        alt="Family Guy"
+        class="char-head active"
         onclick="selectShow('family_guy', this)"
       >
-      <img 
-        src="clips/cleveland_show/head.png" 
-        alt="Cleveland Show" 
-        class="char-head" 
+
+      <img
+        id="head-cleveland"
+        src="clips/cleveland_show/head.png"
+        alt="Cleveland Show"
+        class="char-head"
         onclick="selectShow('cleveland_show', this)"
       >
-      <img 
-        src="clips/bobs_burgers/head.png" 
-        alt="Bob's Burgers" 
-        class="char-head" 
-        onclick="selectShow('bobs_burgers', this)"
+
+      <img
+        id="head-custom"
+        src="clips/custom/head.png"
+        alt="Custom"
+        class="char-head"
+        onclick="selectShow('custom', this)"
       >
+
     </div>
+
+    <!-- VIDEO PLAYER -->
+
+    <video
+      id="player"
+      controls
+      playsinline
+    ></video>
+
+    <!-- GENERATE -->
 
     <div id="buttonContainer">
+
       <div class="generate-wrapper">
-        <img 
-          id="generateBtn" 
-          src="generate_btn_family_guy.png" 
-          alt="Generate" 
-          class="generate-btn-img" 
+
+        <img
+          id="generateBtn"
+          src="generate_btn_family_guy.png"
+          alt="Generate"
+          class="generate-btn-img"
           onclick="playMashup()"
         >
+
         <div id="status"></div>
+
+        <div id="retepProgress"></div>
+
+        <div id="evilError"></div>
+
+        <div id="evilMessage">
+          RETEP HAS AWAKENED
+        </div>
+
       </div>
+
     </div>
 
-    <!-- Video Output Player with controls enabled permanently -->
-    <video id="player" controls playsinline></video>
   </div>
 
-<script type="module">
-  import { FFmpeg } from './ffmpeg/lib/index.js';
-  import { fetchFile, toBlobURL } from './ffmpeg/util/index.js';
+  <!-- =========================================================
+       RETEP POPUPS
+  ========================================================= -->
 
-  let currentShow = 'family_guy';
-  let ffmpeg = null;
-  let ffmpegLoaded = false;
+  <div id="popupContainer"></div>
 
-  const showLibrary = {
-    family_guy: {
-      folder: 'family_guy',
-      startCount: 81,
-      endCount: 100,
-      buttonImg: 'generate_btn_family_guy.png'
-    },
+  <!-- =========================================================
+       RETEP AUDIO
+  ========================================================= -->
 
-    cleveland_show: {
-      folder: 'cleveland_show',
-      startCount: 1,
-      endCount: 1,
-      buttonImg: 'generate_btn_cleveland.png'
-    },
+  <audio
+    id="retepAudio"
+    src="clips/retep/retep.mp3"
+    loop
+    preload="auto"
+  ></audio>
 
-    bobs_burgers: {
-      folder: 'bobs_burgers',
-      startCount: 1,
-      endCount: 1,
-      buttonImg: 'generate_btn_bobs_burgers.png'
-    }
-  };
+  <audio
+    id="retepLaugh"
+    src="clips/retep/laugh.mp3"
+    preload="auto"
+  ></audio>
 
-  function selectShow(showKey, element) {
-    currentShow = showKey;
+  <audio
+    id="retepError"
+    src="clips/retep/error.mp3"
+    preload="auto"
+  ></audio>
 
-    document.body.className = showKey;
 
-    document.querySelectorAll('.char-head').forEach(img => {
-      img.classList.remove('active');
-    });
+  <!-- =========================================================
+       JAVASCRIPT
+  ========================================================= -->
 
-    element.classList.add('active');
+  <script type="module">
 
-    document.getElementById('generateBtn').src =
-      showLibrary[showKey].buttonImg;
-  }
+    import { FFmpeg } from "./ffmpeg/lib/index.js";
 
-  function getRandomInt(max) {
-    return Math.floor(Math.random() * max) + 1;
-  }
+    import {
+      fetchFile,
+      toBlobURL
+    } from "./ffmpeg/util/index.js";
 
-  async function loadFFmpeg() {
-    if (ffmpegLoaded) {
-      return;
-    }
 
-    const status = document.getElementById('status');
+    /* =========================================================
+       GLOBAL STATE
+    ========================================================= */
 
-    status.textContent = 'Loading video engine...';
+    let currentShow = "family_guy";
 
-    ffmpeg = new FFmpeg();
+    let ffmpeg = null;
+    let ffmpegLoaded = false;
+
+    let evilMode = false;
+
+    let evilSequencePosition = 0;
+
+    let popupTimeout = null;
+    let laughTimeout = null;
+
+    let rarityConfig = {
+      family_guy: {
+        // Safe fallback: R1 must not play until a config explicitly enables it.
+        rareChance: 0
+      }
+    };
+
+    // Set this once to your deployed HTTPS Worker /rarity URL. It is public
+    // read-only; the write token is kept only on the controller PC.
+    const REMOTE_RARITY_URL = "";
 
     /*
-     * FFmpeg core files are now hosted locally
-     * by Live Server / GitHub Pages.
-     */
-    const baseURL = './ffmpeg/core';
+      Prevent multiple character transitions happening
+      simultaneously.
+    */
+    let characterTransitioning = false;
 
-    const coreURL = await toBlobURL(
-      `${baseURL}/ffmpeg-core.js`,
-      'text/javascript'
-    );
+    /*
+      Order of shows left-to-right in the character select.
+      Moving to a show further right => exit left / enter right.
+      Moving to a show further left  => exit right / enter left.
+    */
+    const showOrder = ["family_guy", "cleveland_show", "custom"];
+    /* =========================================================
+       SHOW LIBRARY
+    ========================================================= */
 
-    const wasmURL = await toBlobURL(
-      `${baseURL}/ffmpeg-core.wasm`,
-      'application/wasm'
-    );
+    const showLibrary = {
 
-    await ffmpeg.load({
-      coreURL,
-      wasmURL
-    });
+      family_guy: {
+        folder: "family_guy",
+        startCount: 81,
+        endCount: 99,
 
-    ffmpegLoaded = true;
+        buttonImg:
+          "generate_btn_family_guy.png",
 
-    status.textContent = '';
-  }
+        logo:
+          "logo.png"
+      },
 
-  async function playMashup() {
-    const btn = document.getElementById('generateBtn');
-    const player = document.getElementById('player');
-    const status = document.getElementById('status');
+      cleveland_show: {
+        folder: "cleveland_show",
+        startCount: 1,
+        endCount: 1,
 
-    btn.classList.add('disabled');
-    btn.style.pointerEvents = 'none';
+        buttonImg:
+          "generate_btn_cleveland.png",
 
-    try {
-      const config = showLibrary[currentShow];
+        logo:
+          "logo2.png"
+      },
+
+      custom: {
+        folder: "custom",
+        startCount: 1,
+        endCount: 1,
+
+        buttonImg:
+          "generate_btn_bobs_burgers.png",
+
+        logo:
+          "logo3.png"
+      },
+
+      retep: {
+        folder: "retep",
+        startCount: 81,
+        endCount: 3,
+
+        buttonImg:
+          "generate_btn_family_guy.png",
+
+        logo:
+          "logo4.png"
+      }
+
+    };
+
+
+    /* =========================================================
+       CHARACTER TRANSITION
+    ========================================================= */
+
+    function wait(ms) {
+      return new Promise(resolve => {
+        setTimeout(resolve, ms);
+      });
+    }
+
+    async function loadRarityConfig() {
+      try {
+        // This runs before every Generate click.  The cache buster matters on
+        // GitHub Pages, while cache: "no-store" lets local dev servers pick up
+        // a change to rarity-config.json immediately.
+        const configUrl = REMOTE_RARITY_URL
+          ? new URL(REMOTE_RARITY_URL)
+          : new URL("rarity-config.json", import.meta.url);
+        configUrl.searchParams.set("t", Date.now().toString());
+        const response = await fetch(configUrl, { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error(`Could not load rarity config (${response.status})`);
+        }
+
+        const config = await response.json();
+        const chance = config?.family_guy?.rareChance;
+
+        if (typeof chance !== "number" || !Number.isFinite(chance) || chance < 0 || chance > 1) {
+          throw new Error("family_guy.rareChance must be a number from 0 to 1");
+        }
+
+        rarityConfig = config;
+        console.log("Rarity config loaded; Family Guy rare chance:", chance);
+      } catch (error) {
+        // Keep the last known good setting if an update is briefly unavailable.
+        console.error("Could not refresh rarity config; using the last known setting:", error);
+      }
+    }
+
+
+    async function selectShow(showKey, element) {
+
+      if (evilMode) {
+        return;
+      }
+
+      if (characterTransitioning) {
+        return;
+      }
+
+      if (showKey === currentShow) {
+        return;
+      }
+
+      characterTransitioning = true;
+
+      const characterSelect =
+        document.getElementById("characterSelect");
+
+      const oldShow = currentShow;
 
       /*
-       * Pick random START and END clips.
-       */
-      const startNumber = getRandomInt(config.startCount);
-      const endNumber = getRandomInt(config.endCount);
+        Determine which side the transition uses.
+
+        Family Guy -> Cleveland:
+        old icons leave LEFT
+        new icons enter RIGHT
+
+        Cleveland -> Family Guy:
+        old icons leave RIGHT
+        new icons enter LEFT
+      */
+
+      let exitDirection;
+      let enterDirection;
+
+      const oldIndex = showOrder.indexOf(oldShow);
+      const newIndex = showOrder.indexOf(showKey);
+
+      if (newIndex > oldIndex) {
+
+        exitDirection = "left";
+        enterDirection = "right";
+
+      } else {
+
+        exitDirection = "right";
+        enterDirection = "left";
+      }
+
+
+      /* ---------------------------------------------------------
+         EXIT OLD CHARACTERS
+      --------------------------------------------------------- */
+
+      characterSelect.classList.remove(
+        "enter-left",
+        "enter-right",
+        "exit-left",
+        "exit-right",
+        "hidden-for-transition"
+      );
+
+      /*
+        Force browser to register the clean starting state
+        before adding the animation.
+      */
+
+      void characterSelect.offsetWidth;
+
+      characterSelect.classList.add(
+        "transitioning",
+        "exit-" + exitDirection
+      );
+
+
+      /*
+        Wait until the staggered exit has completed.
+
+        Last icon starts at 0.16s
+        + 0.38s animation
+        = 0.54s
+      */
+
+      await wait(580);
+
+
+      /* ---------------------------------------------------------
+         HIDE EVERYTHING COMPLETELY
+         THIS IS THE GLITCH FIX
+      --------------------------------------------------------- */
+
+      characterSelect.classList.remove(
+        "exit-left",
+        "exit-right"
+      );
+
+      characterSelect.classList.add(
+        "hidden-for-transition"
+      );
+
+
+      /*
+        Wait one animation frame so the browser commits
+        the invisible state before changing anything.
+      */
+
+      await new Promise(requestAnimationFrame);
+
+
+      /* ---------------------------------------------------------
+         CHANGE SHOW
+      --------------------------------------------------------- */
+
+      currentShow = showKey;
+
+      characterSelect.classList.toggle(
+        "side-right",
+        showKey === "cleveland_show"
+      );
+
+      document.body.className = showKey;
+
+
+      document
+        .querySelectorAll(".char-head")
+        .forEach(img => {
+
+          img.classList.remove("active");
+
+        });
+
+
+      element.classList.add("active");
+
+
+      const config =
+        showLibrary[showKey];
+
+
+      document.getElementById(
+        "generateBtn"
+      ).src = config.buttonImg;
+
+
+      document.getElementById(
+        "siteLogo"
+      ).src = config.logo;
+
+
+      document.getElementById(
+        "evilError"
+      ).style.display = "none";
+
+
+      document.getElementById(
+        "evilMessage"
+      ).style.display = "none";
+
+
+      document.getElementById(
+        "status"
+      ).textContent = "";
+
+
+      /* ---------------------------------------------------------
+         PREPARE NEW CHARACTERS
+      --------------------------------------------------------- */
+
+      characterSelect.classList.remove(
+        "hidden-for-transition"
+      );
+
+      /*
+        Force layout again so the new entry animation
+        starts from the correct off-screen position.
+      */
+
+      void characterSelect.offsetWidth;
+
+
+      /* ---------------------------------------------------------
+         ENTER NEW CHARACTERS
+      --------------------------------------------------------- */
+
+      characterSelect.classList.add(
+        "enter-" + enterDirection
+      );
+
+
+      /*
+        Last character:
+        0.24s delay + 0.48s animation = 0.72s
+      */
+
+      await wait(760);
+
+
+      /* ---------------------------------------------------------
+         CLEAN ANIMATION CLASSES
+      --------------------------------------------------------- */
+
+      characterSelect.classList.remove(
+        "enter-left",
+        "enter-right",
+        "transitioning"
+      );
+
+
+      characterTransitioning = false;
+    }
+
+
+    /* =========================================================
+       RANDOM INTEGER
+    ========================================================= */
+
+    function getRandomInt(max) {
+
+      return Math.floor(
+        Math.random() * max
+      ) + 1;
+
+    }
+
+
+    /* =========================================================
+       LOAD FFMPEG
+    ========================================================= */
+
+    async function loadFFmpeg() {
+
+      if (ffmpegLoaded) {
+        return;
+      }
+
+      const status =
+        document.getElementById("status");
+
+
+      if (!evilMode) {
+
+        status.textContent =
+          "Loading video engine...";
+
+      }
+
+
+      ffmpeg = new FFmpeg();
+
+
+      const baseURL =
+        "./ffmpeg/core";
+
+
+      const coreURL =
+        await toBlobURL(
+          baseURL + "/ffmpeg-core.js",
+          "text/javascript"
+        );
+
+
+      const wasmURL =
+        await toBlobURL(
+          baseURL + "/ffmpeg-core.wasm",
+          "application/wasm"
+        );
+
+
+      await ffmpeg.load({
+        coreURL,
+        wasmURL
+      });
+
+
+      ffmpegLoaded = true;
+
+
+      status.textContent = "";
+
+    }
+
+
+    /* =========================================================
+       FAKE ERROR
+    ========================================================= */
+
+    function showFakeError() {
+
+      const error =
+        document.getElementById(
+          "evilError"
+        );
+
+
+      evilSequencePosition = 0;
+
+
+      error.innerHTML =
+        "Error: vid" +
+        '<span class="evil-letter" data-letter="e">e</span>' +
+        "o input could not be " +
+        '<span class="evil-letter" data-letter="v">v</span>' +
+        "erified. Re" +
+        '<span class="evil-letter" data-letter="i">i</span>' +
+        "nitialize failed: file was " +
+        '<span class="evil-letter" data-letter="l">l</span>' +
+        "ocked.";
+
+
+      error.style.display = "block";
+
+
+      error
+        .querySelectorAll(".evil-letter")
+        .forEach(letter => {
+
+          letter.addEventListener(
+            "click",
+            handleEvilLetter
+          );
+
+        });
+
+    }
+
+
+    /* =========================================================
+       EVIL LETTER
+    ========================================================= */
+
+    function handleEvilLetter(event) {
+
+      if (evilMode) {
+        return;
+      }
+
+
+      const clicked =
+        event.target.dataset.letter;
+
+
+      const sequence = [
+        "e",
+        "v",
+        "i",
+        "l"
+      ];
+
+
+      if (
+        clicked ===
+        sequence[evilSequencePosition]
+      ) {
+
+        event.target.style.color =
+          "#ffffff";
+
+
+        event.target.style.textShadow =
+          "0 0 8px #fff, 0 0 20px #ff0000";
+
+
+        evilSequencePosition++;
+
+
+        if (
+          evilSequencePosition ===
+          sequence.length
+        ) {
+
+          activateEvilMode();
+
+        }
+
+        return;
+      }
+
+
+      evilSequencePosition = 0;
+
+
+      event.target.animate(
+        [
+          {
+            transform:
+              "translateX(-5px)"
+          },
+
+          {
+            transform:
+              "translateX(5px)"
+          },
+
+          {
+            transform:
+              "translateX(-5px)"
+          },
+
+          {
+            transform:
+              "translateX(0)"
+          }
+        ],
+        {
+          duration: 180
+        }
+      );
+
+    }
+
+
+    /* =========================================================
+       RETEP AUDIO
+    ========================================================= */
+
+    function startRetepAudio() {
+
+      const audio =
+        document.getElementById(
+          "retepAudio"
+        );
+
+
+      audio.loop = true;
+
+      audio.currentTime = 0;
+
+      audio.play().catch(() => {});
+
+    }
+
+
+    /* =========================================================
+       RETEP LAUGH
+    ========================================================= */
+
+    function playRetepLaugh() {
+
+      if (!evilMode) {
+        return;
+      }
+
+
+      const laugh =
+        document.getElementById(
+          "retepLaugh"
+        );
+
+
+      laugh.pause();
+
+      laugh.currentTime = 0;
+
+      laugh.play().catch(() => {});
+
+
+      scheduleRetepLaugh();
+
+    }
+
+
+    function scheduleRetepLaugh() {
+
+      if (!evilMode) {
+        return;
+      }
+
+
+      const delay =
+        4000 +
+        Math.floor(
+          Math.random() * 10000
+        );
+
+
+      laughTimeout =
+        setTimeout(
+          playRetepLaugh,
+          delay
+        );
+
+    }
+
+
+    /* =========================================================
+       RETEP POPUP
+    ========================================================= */
+
+    function createRetepPopup() {
+
+      if (!evilMode) {
+        return;
+      }
+
+
+      const container =
+        document.getElementById(
+          "popupContainer"
+        );
+
+
+      const errorSound =
+        document.getElementById(
+          "retepError"
+        );
+
+
+      errorSound.pause();
+
+      errorSound.currentTime = 0;
+
+      errorSound.play().catch(() => {});
+
+
+      const popup =
+        document.createElement("div");
+
+
+      popup.className =
+        "retep-popup";
+
+
+      const maxX =
+        Math.max(
+          10,
+          window.innerWidth - 290
+        );
+
+
+      const maxY =
+        Math.max(
+          10,
+          window.innerHeight - 230
+        );
+
+
+      popup.style.left =
+        Math.floor(
+          Math.random() * maxX
+        ) + "px";
+
+
+      popup.style.top =
+        Math.floor(
+          Math.random() * maxY
+        ) + "px";
+
+
+      popup.style.width =
+        220 +
+        Math.floor(
+          Math.random() * 180
+        ) +
+        "px";
+
+
+      const titles = [
+        "RETEP.exe",
+        "SYSTEM ERROR",
+        "unknown.exe",
+        "griffin_machine",
+        "WARNING",
+        "Windows",
+        "ERROR",
+        "???"
+      ];
+
+
+      const title =
+        titles[
+          Math.floor(
+            Math.random() *
+            titles.length
+          )
+        ];
+
+
+      const showImage =
+        Math.random() < 0.05;
+
+
+      const imageHTML =
+        showImage
+          ? '<img class="popup-image" src="clips/retep/popup.jpg" alt="">'
+          : "";
+
+
+      popup.innerHTML =
+        '<div class="popup-titlebar">' +
+
+          '<span>' +
+            title +
+          '</span>' +
+
+          '<div class="popup-buttons">' +
+
+            '<div class="popup-button">−</div>' +
+            '<div class="popup-button">□</div>' +
+            '<div class="popup-button">×</div>' +
+
+          '</div>' +
+
+        '</div>' +
+
+        '<div class="popup-body">' +
+
+          imageHTML +
+
+          '<div class="popup-text">' +
+
+            'RETEP HAS FOUND YOU.<br>' +
+            'SYSTEM INTEGRITY: FAILED<br>' +
+            'ENTITY STATUS: ACTIVE<br>' +
+            'DO NOT CLOSE THIS WINDOW.' +
+
+          '</div>' +
+
+        '</div>';
+
+
+      container.appendChild(popup);
+
+
+      const lifetime =
+        1400 +
+        Math.floor(
+          Math.random() * 2600
+        );
+
+
+      setTimeout(() => {
+
+        popup.classList.add(
+          "removing"
+        );
+
+
+        setTimeout(() => {
+
+          popup.remove();
+
+        }, 220);
+
+      }, lifetime);
+
+    }
+
+
+    /* =========================================================
+       RETEP POPUP LOOP
+    ========================================================= */
+
+    function scheduleRetepPopup() {
+
+      if (!evilMode) {
+        return;
+      }
+
+
+      const delay =
+        2500 +
+        Math.floor(
+          Math.random() * 7000
+        );
+
+
+      popupTimeout =
+        setTimeout(() => {
+
+          createRetepPopup();
+
+
+          if (
+            Math.random() < 0.12
+          ) {
+
+            setTimeout(() => {
+
+              createRetepPopup();
+
+            }, 250);
+
+          }
+
+
+          scheduleRetepPopup();
+
+        }, delay);
+
+    }
+
+
+    /* =========================================================
+       ACTIVATE RETEP
+    ========================================================= */
+
+    function activateEvilMode() {
+
+      evilMode = true;
+
+      currentShow = "retep";
+
+
+      document.body.className =
+        "retep";
+
+
+      document.getElementById(
+        "siteLogo"
+      ).src =
+        "logo4.png";
+
+
+      document
+        .querySelectorAll(".char-head")
+        .forEach(img => {
+
+          img.src =
+            "clips/retep/head.png";
+
+          img.alt =
+            "RETEP";
+
+          img.classList.add(
+            "active"
+          );
+
+        });
+
+
+      document.getElementById(
+        "generateBtn"
+      ).src =
+        "generate_btn_family_guy.png";
+
+
+      const error =
+        document.getElementById(
+          "evilError"
+        );
+
+
+      error.classList.add(
+        "complete"
+      );
+
+
+      error.innerHTML =
+        "ERROR: UNAUTHORIZED ENTITY DETECTED";
+
+
+      document.getElementById(
+        "evilMessage"
+      ).style.display =
+        "none";
+
+
+      startRetepAudio();
+
+      scheduleRetepLaugh();
+
+
+      setTimeout(() => {
+
+        createRetepPopup();
+
+      }, 700);
+
+
+      scheduleRetepPopup();
+
+
+      document.getElementById(
+        "status"
+      ).textContent = "";
+
+    }
+
+
+    /* =========================================================
+       NORMAL GENERATION
+    ========================================================= */
+
+    async function generateNormalVideo(config) {
+
+      // R1 is an override, rather than a probability: 1 means always; 0 means never.
+      if (config.folder === "family_guy" &&
+          rarityConfig.family_guy &&
+          rarityConfig.family_guy.rareChance === 1) {
+        console.log("Rare override enabled; playing R1.mp4.");
+        const rarePath = "clips/family_guy/rare/R1.mp4";
+
+        await ffmpeg.writeFile(
+          "rare.mp4",
+          await fetchFile(rarePath)
+        );
+
+        return "rare.mp4";
+      }
+
+      // For normal videos, stitch start + end
+      const startNumber =
+        getRandomInt(
+          config.startCount
+        );
 
       const startPath =
-        `clips/${config.folder}/start/S${startNumber}.mp4`;
+        "clips/" +
+        config.folder +
+        "/start/S" +
+        startNumber +
+        ".mp4";
+
+      const endNumber =
+        getRandomInt(
+          config.endCount
+        );
 
       const endPath =
-        `clips/${config.folder}/end/E${endNumber}.mp4`;
+        "clips/" +
+        config.folder +
+        "/end/E" +
+        endNumber +
+        ".mp4";
 
-      console.log('Start clip:', startPath);
-      console.log('End clip:', endPath);
+      console.log(
+        "Start clip:",
+        startPath
+      );
 
-      /*
-       * Load FFmpeg.
-       */
-      await loadFFmpeg();
+      console.log(
+        "End clip:",
+        endPath
+      );
 
-      status.textContent = 'Downloading clips...';
-
-      /*
-       * Download START clip into FFmpeg.
-       */
       await ffmpeg.writeFile(
-        'start.mp4',
+        "start.mp4",
         await fetchFile(startPath)
       );
 
-      /*
-       * Download END clip into FFmpeg.
-       */
+
       await ffmpeg.writeFile(
-        'end.mp4',
+        "end.mp4",
         await fetchFile(endPath)
       );
 
-      status.textContent = 'Merging clips...';
 
-      /*
-       * Tell FFmpeg which files to concatenate.
-       */
       await ffmpeg.writeFile(
-        'inputs.txt',
+        "inputs.txt",
         new TextEncoder().encode(
           "file 'start.mp4'\n" +
           "file 'end.mp4'\n"
         )
       );
 
-      /*
-       * Merge START + END into ONE MP4.
-       *
-       * No playback switching is happening here.
-       * FFmpeg creates an actual new video file.
-       */
+
       await ffmpeg.exec([
-        '-f',
-        'concat',
-        '-safe',
-        '0',
-        '-i',
-        'inputs.txt',
-        '-c',
-        'copy',
-        'merged.mp4'
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        "inputs.txt",
+        "-c",
+        "copy",
+        "merged.mp4"
       ]);
 
-      status.textContent = 'Preparing video...';
 
-      /*
-       * Read the ONE resulting video.
-       */
-      const data = await ffmpeg.readFile('merged.mp4');
+      return "merged.mp4";
 
-      const blob = new Blob(
-        [data.buffer],
-        {
-          type: 'video/mp4'
-        }
+    }
+
+
+    /* =========================================================
+       RETEP GENERATION
+    ========================================================= */
+
+    async function generateRetepVideo(config) {
+
+      const progressEl =
+        document.getElementById("retepProgress");
+
+      const updateProgress = (value, label = "") => {
+        progressEl.style.display = "block";
+        progressEl.textContent = label
+          ? value + "% — " + label
+          : value + "%";
+      };
+
+      updateProgress(10, "loading start clip");
+
+      const startNumber =
+        getRandomInt(
+          config.startCount
+        );
+
+      const startFile =
+        "retep_start.mp4";
+
+      await ffmpeg.writeFile(
+        startFile,
+        await fetchFile(
+          "clips/retep/start/S" +
+          startNumber +
+          ".mp4"
+        )
       );
 
-      const mergedURL =
-        URL.createObjectURL(blob);
+      updateProgress(40, "loading end clip");
 
-      /*
-       * Give the player the merged file.
-       */
-      player.src = mergedURL;
-      player.style.display = 'block';
-
-      player.load();
-
-      try {
-        await player.play();
-      } catch (err) {
-        console.log(
-          'Autoplay blocked. User interaction required.',
-          err
+      const endNumber =
+        getRandomInt(
+          config.endCount
         );
+
+      const endFile =
+        "retep_end.mp4";
+
+      await ffmpeg.writeFile(
+        endFile,
+        await fetchFile(
+          "clips/retep/end/E" +
+          endNumber +
+          ".mp4"
+        )
+      );
+
+      updateProgress(60, "normalizing clip timing");
+
+      await ffmpeg.exec([
+        "-i",
+        "retep_start.mp4",
+        "-i",
+        "retep_end.mp4",
+        "-filter_complex",
+        "[0:v]trim=0:2.5,setpts=PTS-STARTPTS,fps=12,scale=320:-2[v0];" +
+        "[1:v]setpts=PTS-STARTPTS,fps=12,scale=320:-2[v1];" +
+        "[0:a]atrim=0:2.5,asetpts=PTS-STARTPTS[a0];" +
+        "[1:a]asetpts=PTS-STARTPTS[a1];" +
+        "[v0][a0][v1][a1]concat=n=2:v=1:a=1[outv][outa]",
+        "-map",
+        "[outv]",
+        "-map",
+        "[outa]",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "ultrafast",
+        "-crf",
+        "54",
+        "-b:v",
+        "18k",
+        "-pix_fmt",
+        "yuv420p",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "8k",
+        "-ac",
+        "2",
+        "-movflags",
+        "+faststart",
+        "retep_final.mp4"
+      ]);
+
+      updateProgress(100, "finalizing");
+
+      return "retep_final.mp4";
+
+    }
+
+
+    /* =========================================================
+       PLAY MASHUP
+    ========================================================= */
+
+    async function playMashup() {
+
+      const btn =
+        document.getElementById(
+          "generateBtn"
+        );
+
+
+      const player =
+        document.getElementById(
+          "player"
+        );
+
+
+      const status =
+        document.getElementById(
+          "status"
+        );
+
+
+      /* BOB'S BURGERS / EVIL SEQUENCE */
+
+      if (
+        currentShow === "custom" &&
+        !evilMode
+      ) {
+
+        showFakeError();
+
+        return;
+
       }
 
-      status.textContent = '';
 
-    } catch (error) {
+      /* DISABLE BUTTON */
 
-      console.error('FFmpeg error:', error);
+      btn.classList.add(
+        "disabled"
+      );
 
-      status.textContent =
-        'Error creating video. Check the console.';
+      document.getElementById("buttonContainer").classList.remove("video-visible");
 
-    } finally {
+      btn.style.pointerEvents =
+        "none";
 
-      btn.classList.remove('disabled');
-      btn.style.pointerEvents = 'auto';
+
+      try {
+
+        /* LOAD FFMPEG ONCE */
+
+        await loadFFmpeg();
+
+        /* RELOAD RARITY CONFIG FOR REAL-TIME CHANGES */
+
+        await loadRarityConfig();
+
+
+        let outputFile;
+
+
+        /* RETEP */
+
+        if (evilMode) {
+
+          status.textContent = "";
+
+
+          outputFile =
+            await generateRetepVideo(
+              showLibrary.retep
+            );
+
+        }
+
+
+        /* NORMAL */
+
+        else {
+
+          status.textContent =
+            "Downloading clips...";
+
+
+          outputFile =
+            await generateNormalVideo(
+              showLibrary[currentShow]
+            );
+
+        }
+
+
+        /* READ OUTPUT */
+
+        status.textContent = "";
+
+
+        const data =
+          await ffmpeg.readFile(
+            outputFile
+          );
+
+
+        const blob =
+          new Blob(
+            [data],
+            {
+              type: "video/mp4"
+            }
+          );
+
+
+        const mergedURL =
+          URL.createObjectURL(
+            blob
+          );
+
+
+        /*
+          Do NOT touch the current player until
+          generation has completely finished.
+        */
+
+        if (
+          player.dataset.objectUrl
+        ) {
+
+          URL.revokeObjectURL(
+            player.dataset.objectUrl
+          );
+
+        }
+
+
+        player.dataset.objectUrl =
+          mergedURL;
+
+
+        player.src =
+          mergedURL;
+
+
+        player.style.display =
+          "block";
+
+        document.getElementById("buttonContainer").classList.add("video-visible");
+
+        player.load();
+
+
+        /* AUTOPLAY */
+
+        try {
+
+          await player.play();
+
+        } catch (err) {
+
+          console.log(
+            "Autoplay blocked.",
+            err
+          );
+
+        }
+
+
+        status.textContent = "";
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "FFmpeg error:",
+          error
+        );
+
+
+        if (!evilMode) {
+
+          status.textContent =
+            "Error creating video. Check the console.";
+
+        } else {
+
+          status.textContent = "";
+
+        }
+
+      }
+
+
+      finally {
+
+        const retepProgress =
+          document.getElementById("retepProgress");
+
+        retepProgress.style.display = "none";
+        retepProgress.textContent = "";
+
+        btn.classList.remove(
+          "disabled"
+        );
+
+
+        btn.style.pointerEvents =
+          "auto";
+
+      }
+
     }
-  }
 
-  /*
-   * Required because your HTML uses:
-   *
-   * onclick="selectShow(...)"
-   * onclick="playMashup()"
-   */
-  window.selectShow = selectShow;
-  window.playMashup = playMashup;
 
-</script>
+    /* =========================================================
+       GLOBAL FUNCTIONS
+    ========================================================= */
+
+    window.selectShow =
+      selectShow;
+
+
+    window.playMashup =
+      playMashup;
+
+    /* =========================================================
+       INITIALIZATION
+    ========================================================= */
+
+    loadRarityConfig();
+
+  </script>
+
 </body>
 </html>

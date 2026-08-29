@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,12 +21,9 @@
       min-height: 100vh;
       margin: 0;
       transition: background 0.8s ease-in-out;
-
-      /* Keep zoom-to-fit, but anchor the image to the bottom */
       background-size: cover;
       background-position: center bottom;
       background-repeat: no-repeat;
-
       overflow-x: hidden;
     }
 
@@ -150,19 +148,16 @@
 
     /* =========================================================
        LOGO
-       50% larger than the previous logo size.
     ========================================================= */
 
     #siteLogo {
       width: 507px;
       max-width: 63vw;
       height: auto;
-
       position: fixed;
       top: 24px;
       left: 50%;
       transform: translateX(-50%);
-
       z-index: 20;
       pointer-events: none;
 
@@ -198,14 +193,11 @@
       padding: 160px 30px 20px;
       text-align: center;
       color: #fff;
-
       max-width: 540px;
       width: 92%;
-
       display: flex;
       flex-direction: column;
       align-items: center;
-
       position: relative;
       z-index: 5;
     }
@@ -216,50 +208,32 @@
 
     .character-select {
       position: fixed;
-
       left: 25px;
       right: auto;
       top: 50%;
-
       transform: translateY(-50%);
 
       display: flex;
       flex-direction: column;
-
       justify-content: center;
       align-items: flex-start;
 
       gap: 20px;
-
       margin: 0;
-
       z-index: 15;
-
-      /*
-        Important:
-        The container itself NEVER moves.
-        Individual characters move independently.
-        This prevents the tiny layout glitch.
-      */
       pointer-events: none;
     }
 
     .char-head {
       width: 110px;
       height: 110px;
-
       flex-shrink: 0;
-
       border-radius: 50%;
-
       object-fit: cover;
-
       cursor: pointer;
-
       pointer-events: auto;
 
       border: 1px solid rgba(0, 0, 0, 0.45);
-
       background: rgba(20, 20, 20, 0.083);
 
       backdrop-filter: blur(2px);
@@ -269,10 +243,6 @@
         drop-shadow(0 0 10px rgba(0, 0, 0, 0.364))
         drop-shadow(0 8px 16px rgba(0, 0, 0, 1));
 
-      /*
-        No transition on transform here.
-        CSS animations control all movement.
-      */
       transition:
         border-color 0.3s ease,
         filter 0.3s ease;
@@ -282,6 +252,7 @@
 
     .char-head:hover {
       transform: scale(1.15);
+
       filter:
         drop-shadow(0 0 14px rgba(0, 0, 0, 1))
         drop-shadow(0 12px 24px rgba(0, 0, 0, 1));
@@ -289,10 +260,12 @@
 
     .char-head.active {
       border-color: rgba(255, 255, 255, 0.8);
+
       box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.35),
         0 0 12px rgba(255, 255, 255, 0.28),
         0 0 22px rgba(255, 255, 255, 0.18);
+
       filter:
         drop-shadow(0 0 10px rgba(0, 0, 0, 0.364))
         drop-shadow(0 0 18px rgba(255, 255, 255, 0.32))
@@ -301,14 +274,6 @@
 
     /* =========================================================
        CHARACTER SLIDE SYSTEM
-
-       LEFT SIDE:
-       - Griffin icons enter from LEFT
-       - Cleveland icons leave to LEFT
-
-       RIGHT SIDE:
-       - Cleveland icons enter from RIGHT
-       - Griffin icons leave to RIGHT
     ========================================================= */
 
     .character-select.side-right {
@@ -320,14 +285,7 @@
       pointer-events: none;
     }
 
-    /*
-      During transition the icons are individually animated.
-      Each gets a different delay.
-    */
-
-    /* -------------------------
-       ENTER FROM LEFT
-    ------------------------- */
+    /* ENTER FROM LEFT */
 
     .character-select.enter-left .char-head {
       animation-name: characterEnterLeft;
@@ -364,9 +322,7 @@
       }
     }
 
-    /* -------------------------
-       ENTER FROM RIGHT
-    ------------------------- */
+    /* ENTER FROM RIGHT */
 
     .character-select.enter-right .char-head {
       animation-name: characterEnterRight;
@@ -403,9 +359,7 @@
       }
     }
 
-    /* -------------------------
-       EXIT TO LEFT
-    ------------------------- */
+    /* EXIT TO LEFT */
 
     .character-select.exit-left .char-head {
       animation-name: characterExitLeft;
@@ -438,9 +392,7 @@
       }
     }
 
-    /* -------------------------
-       EXIT TO RIGHT
-    ------------------------- */
+    /* EXIT TO RIGHT */
 
     .character-select.exit-right .char-head {
       animation-name: characterExitRight;
@@ -473,10 +425,7 @@
       }
     }
 
-    /*
-      While waiting between exit and entry, keep the icons
-      completely invisible. This is the fix for the tiny glitch.
-    */
+    /* HIDDEN DURING TRANSITION */
 
     .character-select.hidden-for-transition .char-head {
       opacity: 0 !important;
@@ -521,7 +470,6 @@
       -webkit-backdrop-filter: blur(2px);
 
       padding: 20px 30px;
-
       border-radius: 20px;
 
       border: 1px solid rgba(0, 0, 0, 0.45);
@@ -539,7 +487,6 @@
 
       width: fit-content;
       min-width: 280px;
-
       box-sizing: border-box;
     }
 
@@ -550,7 +497,6 @@
     .generate-btn-img {
       width: 220px;
       height: auto;
-
       cursor: pointer;
 
       transition:
@@ -590,16 +536,11 @@
     video {
       width: 110%;
       max-width: 520px;
-
       border-radius: 8px;
-
       margin-top: 0;
       margin-bottom: 2px;
-
       background: #000;
-
       display: none;
-
       order: 1;
 
       box-shadow:
@@ -613,10 +554,8 @@
 
     #status {
       margin-top: 10px;
-
       font-size: 16px;
       font-weight: bold;
-
       color: #fff;
 
       text-shadow:
@@ -629,12 +568,9 @@
 
     #retepProgress {
       display: none;
-
       margin-top: 8px;
-
       font-size: 14px;
       font-weight: bold;
-
       color: #fff;
 
       text-shadow:
@@ -660,23 +596,16 @@
       margin-top: 2px;
     }
 
-    .generate-wrapper {
-      position: relative;
-    }
-
     /* =========================================================
        FAKE ERROR
     ========================================================= */
 
     #evilError {
       display: none;
-
       margin-top: 12px;
-
       max-width: 340px;
 
       font-family: monospace;
-
       font-size: 13px;
       line-height: 1.5;
 
@@ -691,9 +620,7 @@
 
     .evil-letter {
       cursor: pointer;
-
       font-weight: normal;
-
       color: #ff0000;
 
       text-shadow:
@@ -714,7 +641,6 @@
         0 0 18px #ff0000;
 
       transform: scale(1.25);
-
       display: inline-block;
     }
 
@@ -738,14 +664,11 @@
 
     #evilMessage {
       display: none;
-
       margin-top: 12px;
-
       color: #ff0000;
 
       font-family: monospace;
       font-weight: 900;
-
       font-size: 18px;
 
       text-shadow:
@@ -772,26 +695,19 @@
 
     #popupContainer {
       position: fixed;
-
       inset: 0;
-
       width: 100vw;
       height: 100vh;
-
       pointer-events: none;
-
       z-index: 1000;
-
       overflow: hidden;
     }
 
     .retep-popup {
       position: absolute;
-
       width: 260px;
 
       background: #d9d9d9;
-
       border: 2px solid #111;
 
       box-shadow:
@@ -807,21 +723,17 @@
 
     .popup-titlebar {
       height: 25px;
-
       display: flex;
       align-items: center;
       justify-content: space-between;
 
       padding: 0 6px;
-
       box-sizing: border-box;
 
       background: #111;
-
       color: #fff;
 
       font-family: Arial, sans-serif;
-
       font-size: 12px;
       font-weight: bold;
 
@@ -842,9 +754,7 @@
       justify-content: center;
 
       background: #777;
-
       color: #fff;
-
       border: 1px solid #000;
 
       font-size: 9px;
@@ -853,26 +763,19 @@
 
     .popup-body {
       padding: 8px;
-
       background: #222;
-
       color: #fff;
 
       font-family: monospace;
-
       font-size: 10px;
-
       text-align: left;
     }
 
     .popup-image {
       width: 100%;
       height: auto;
-
       display: block;
-
       margin-bottom: 7px;
-
       border: 1px solid #000;
     }
 
@@ -888,7 +791,6 @@
     @keyframes popupAppear {
       0% {
         opacity: 0;
-
         transform:
           scale(0.4)
           rotate(-8deg);
@@ -896,7 +798,6 @@
 
       70% {
         opacity: 1;
-
         transform:
           scale(1.05)
           rotate(2deg);
@@ -904,7 +805,6 @@
 
       100% {
         opacity: 1;
-
         transform:
           scale(1)
           rotate(0deg);
@@ -934,7 +834,6 @@
 
       to {
         opacity: 0;
-
         transform:
           scale(0.2)
           rotate(10deg);
@@ -947,15 +846,11 @@
 
     body.retep::after {
       content: "";
-
       position: fixed;
-
       inset: 0;
 
       pointer-events: none;
-
       z-index: 2;
-
       opacity: 0.16;
 
       background:
@@ -1160,7 +1055,6 @@
     ========================================================= */
 
     let currentShow = "family_guy";
-
     let ffmpeg = null;
     let ffmpegLoaded = false;
 
@@ -1173,27 +1067,36 @@
 
     let rarityConfig = {
       family_guy: {
-        // Safe fallback: R1 must not play until a config explicitly enables it.
         rareChance: 0
       }
     };
 
-    // Set this once to your deployed HTTPS Worker /rarity URL. It is public
-    // read-only; the write token is kept only on the controller PC.
+    /*
+      Leave empty when using rarity-config.json locally/GitHub Pages.
+    */
+
     const REMOTE_RARITY_URL = "";
 
-    /*
-      Prevent multiple character transitions happening
-      simultaneously.
-    */
-    let characterTransitioning = false;
 
     /*
-      Order of shows left-to-right in the character select.
-      Moving to a show further right => exit left / enter right.
-      Moving to a show further left  => exit right / enter left.
+      Prevent multiple character transitions
+      happening simultaneously.
     */
-    const showOrder = ["family_guy", "cleveland_show", "custom"];
+
+    let characterTransitioning = false;
+
+
+    /*
+      Order of shows.
+    */
+
+    const showOrder = [
+      "family_guy",
+      "cleveland_show",
+      "custom"
+    ];
+
+
     /* =========================================================
        SHOW LIBRARY
     ========================================================= */
@@ -1214,8 +1117,8 @@
 
       cleveland_show: {
         folder: "cleveland_show",
-        startCount: 1,
-        endCount: 1,
+        startCount: 12,
+        endCount: 12,
 
         buttonImg:
           "generate_btn_cleveland.png",
@@ -1261,36 +1164,82 @@
       });
     }
 
+
+    /* =========================================================
+       LOAD RARITY CONFIG
+    ========================================================= */
+
     async function loadRarityConfig() {
+
       try {
-        // This runs before every Generate click.  The cache buster matters on
-        // GitHub Pages, while cache: "no-store" lets local dev servers pick up
-        // a change to rarity-config.json immediately.
+
         const configUrl = REMOTE_RARITY_URL
           ? new URL(REMOTE_RARITY_URL)
-          : new URL("rarity-config.json", import.meta.url);
-        configUrl.searchParams.set("t", Date.now().toString());
-        const response = await fetch(configUrl, { cache: "no-store" });
+          : new URL(
+              "rarity-config.json",
+              import.meta.url
+            );
+
+        configUrl.searchParams.set(
+          "t",
+          Date.now().toString()
+        );
+
+        const response = await fetch(
+          configUrl,
+          {
+            cache: "no-store"
+          }
+        );
 
         if (!response.ok) {
-          throw new Error(`Could not load rarity config (${response.status})`);
+          throw new Error(
+            `Could not load rarity config (${response.status})`
+          );
         }
 
-        const config = await response.json();
-        const chance = config?.family_guy?.rareChance;
+        const config =
+          await response.json();
 
-        if (typeof chance !== "number" || !Number.isFinite(chance) || chance < 0 || chance > 1) {
-          throw new Error("family_guy.rareChance must be a number from 0 to 1");
+        const chance =
+          config?.family_guy?.rareChance;
+
+        if (
+          typeof chance !== "number" ||
+          !Number.isFinite(chance) ||
+          chance < 0 ||
+          chance > 1
+        ) {
+          throw new Error(
+            "family_guy.rareChance must be a number from 0 to 1"
+          );
         }
 
-        rarityConfig = config;
-        console.log("Rarity config loaded; Family Guy rare chance:", chance);
-      } catch (error) {
-        // Keep the last known good setting if an update is briefly unavailable.
-        console.error("Could not refresh rarity config; using the last known setting:", error);
+        rarityConfig =
+          config;
+
+        console.log(
+          "Rarity config loaded; Family Guy rare chance:",
+          chance
+        );
+
       }
+
+      catch (error) {
+
+        console.error(
+          "Could not refresh rarity config; using the last known setting:",
+          error
+        );
+
+      }
+
     }
 
+
+    /* =========================================================
+       SELECT SHOW
+    ========================================================= */
 
     async function selectShow(showKey, element) {
 
@@ -1309,37 +1258,36 @@
       characterTransitioning = true;
 
       const characterSelect =
-        document.getElementById("characterSelect");
+        document.getElementById(
+          "characterSelect"
+        );
 
-      const oldShow = currentShow;
+      const oldShow =
+        currentShow;
 
-      /*
-        Determine which side the transition uses.
-
-        Family Guy -> Cleveland:
-        old icons leave LEFT
-        new icons enter RIGHT
-
-        Cleveland -> Family Guy:
-        old icons leave RIGHT
-        new icons enter LEFT
-      */
 
       let exitDirection;
       let enterDirection;
 
-      const oldIndex = showOrder.indexOf(oldShow);
-      const newIndex = showOrder.indexOf(showKey);
+      const oldIndex =
+        showOrder.indexOf(oldShow);
+
+      const newIndex =
+        showOrder.indexOf(showKey);
+
 
       if (newIndex > oldIndex) {
 
         exitDirection = "left";
         enterDirection = "right";
 
-      } else {
+      }
+
+      else {
 
         exitDirection = "right";
         enterDirection = "left";
+
       }
 
 
@@ -1355,11 +1303,6 @@
         "hidden-for-transition"
       );
 
-      /*
-        Force browser to register the clean starting state
-        before adding the animation.
-      */
-
       void characterSelect.offsetWidth;
 
       characterSelect.classList.add(
@@ -1368,20 +1311,11 @@
       );
 
 
-      /*
-        Wait until the staggered exit has completed.
-
-        Last icon starts at 0.16s
-        + 0.38s animation
-        = 0.54s
-      */
-
       await wait(580);
 
 
       /* ---------------------------------------------------------
-         HIDE EVERYTHING COMPLETELY
-         THIS IS THE GLITCH FIX
+         HIDE EVERYTHING
       --------------------------------------------------------- */
 
       characterSelect.classList.remove(
@@ -1394,67 +1328,77 @@
       );
 
 
-      /*
-        Wait one animation frame so the browser commits
-        the invisible state before changing anything.
-      */
-
-      await new Promise(requestAnimationFrame);
+      await new Promise(
+        requestAnimationFrame
+      );
 
 
       /* ---------------------------------------------------------
          CHANGE SHOW
       --------------------------------------------------------- */
 
-      currentShow = showKey;
+      currentShow =
+        showKey;
 
       characterSelect.classList.toggle(
         "side-right",
         showKey === "cleveland_show"
       );
 
-      document.body.className = showKey;
+      document.body.className =
+        showKey;
 
 
       document
         .querySelectorAll(".char-head")
         .forEach(img => {
 
-          img.classList.remove("active");
+          img.classList.remove(
+            "active"
+          );
 
         });
 
 
-      element.classList.add("active");
+      element.classList.add(
+        "active"
+      );
 
 
       const config =
-        showLibrary[showKey];
+        showLibrary[
+          showKey
+        ];
 
 
       document.getElementById(
         "generateBtn"
-      ).src = config.buttonImg;
+      ).src =
+        config.buttonImg;
 
 
       document.getElementById(
         "siteLogo"
-      ).src = config.logo;
+      ).src =
+        config.logo;
 
 
       document.getElementById(
         "evilError"
-      ).style.display = "none";
+      ).style.display =
+        "none";
 
 
       document.getElementById(
         "evilMessage"
-      ).style.display = "none";
+      ).style.display =
+        "none";
 
 
       document.getElementById(
         "status"
-      ).textContent = "";
+      ).textContent =
+        "";
 
 
       /* ---------------------------------------------------------
@@ -1465,11 +1409,6 @@
         "hidden-for-transition"
       );
 
-      /*
-        Force layout again so the new entry animation
-        starts from the correct off-screen position.
-      */
-
       void characterSelect.offsetWidth;
 
 
@@ -1478,14 +1417,10 @@
       --------------------------------------------------------- */
 
       characterSelect.classList.add(
-        "enter-" + enterDirection
+        "enter-" +
+        enterDirection
       );
 
-
-      /*
-        Last character:
-        0.24s delay + 0.48s animation = 0.72s
-      */
 
       await wait(760);
 
@@ -1500,8 +1435,8 @@
         "transitioning"
       );
 
-
       characterTransitioning = false;
+
     }
 
 
@@ -1519,6 +1454,316 @@
 
 
     /* =========================================================
+       GET VIDEO DURATION
+       ---------------------------------------------------------
+       Used to reject accidentally uploaded long
+       compilation files.
+    ========================================================= */
+
+    function getVideoDuration(src) {
+
+      return new Promise(
+        (resolve, reject) => {
+
+          const video =
+            document.createElement(
+              "video"
+            );
+
+          let finished = false;
+
+          const cleanup = () => {
+
+            video.removeAttribute(
+              "src"
+            );
+
+            video.load();
+
+          };
+
+
+          const timeout =
+            setTimeout(() => {
+
+              if (finished) {
+                return;
+              }
+
+              finished = true;
+
+              cleanup();
+
+              reject(
+                new Error(
+                  "Timed out while reading video duration"
+                )
+              );
+
+            }, 15000);
+
+
+          video.preload =
+            "metadata";
+
+          video.muted = true;
+
+
+          video.onloadedmetadata =
+            () => {
+
+              if (finished) {
+                return;
+              }
+
+              finished = true;
+
+              clearTimeout(
+                timeout
+              );
+
+              const duration =
+                video.duration;
+
+              cleanup();
+
+              if (
+                !Number.isFinite(duration) ||
+                duration <= 0
+              ) {
+
+                reject(
+                  new Error(
+                    "Invalid video duration"
+                  )
+                );
+
+                return;
+              }
+
+              resolve(
+                duration
+              );
+
+            };
+
+
+          video.onerror =
+            () => {
+
+              if (finished) {
+                return;
+              }
+
+              finished = true;
+
+              clearTimeout(
+                timeout
+              );
+
+              cleanup();
+
+              reject(
+                new Error(
+                  "Could not read video metadata"
+                )
+              );
+
+            };
+
+
+          video.src = src;
+
+        }
+      );
+
+    }
+
+
+    /* =========================================================
+       FIND VALID RANDOM CLIP
+       ---------------------------------------------------------
+       Cleveland clips are checked before being downloaded
+       into FFmpeg.
+
+       Bad 20-minute compilations are rejected.
+    ========================================================= */
+
+    async function getValidRandomClip(
+      config,
+      type
+    ) {
+
+      /*
+        Maximum allowed duration.
+
+        Only Cleveland gets this strict check.
+      */
+
+      const maxDuration =
+        config.folder === "cleveland_show"
+          ? 60
+          : Infinity;
+
+
+      const count =
+        type === "start"
+          ? config.startCount
+          : config.endCount;
+
+
+      /*
+        Make a randomized list of all possible
+        clip numbers.
+
+        This means we don't keep randomly picking
+        the same invalid file.
+      */
+
+      const numbers =
+        Array.from(
+          {
+            length: count
+          },
+          (_, index) =>
+            index + 1
+        );
+
+
+      for (
+        let i = numbers.length - 1;
+        i > 0;
+        i--
+      ) {
+
+        const j =
+          Math.floor(
+            Math.random() *
+            (i + 1)
+          );
+
+        [
+          numbers[i],
+          numbers[j]
+        ] =
+        [
+          numbers[j],
+          numbers[i]
+        ];
+
+      }
+
+
+      /*
+        Try every available clip until
+        one passes validation.
+      */
+
+      for (const number of numbers) {
+
+        const path =
+          "clips/" +
+          config.folder +
+          "/" +
+          type +
+          "/";
+
+        const filename =
+          (
+            type === "start"
+              ? "S"
+              : "E"
+          ) +
+          number +
+          ".mp4";
+
+        const fullPath =
+          path +
+          filename;
+
+
+        /*
+          Cleveland duration check.
+        */
+
+        if (
+          Number.isFinite(
+            maxDuration
+          )
+        ) {
+
+          try {
+
+            const duration =
+              await getVideoDuration(
+                fullPath
+              );
+
+
+            console.log(
+              `${fullPath} duration: ${duration.toFixed(2)}s`
+            );
+
+
+            if (
+              duration >
+              maxDuration
+            ) {
+
+              console.warn(
+                `Rejected ${fullPath} because it is ${duration.toFixed(2)}s long. Maximum is ${maxDuration}s.`
+              );
+
+              continue;
+
+            }
+
+          }
+
+          catch (error) {
+
+            console.warn(
+              `Could not validate ${fullPath}:`,
+              error
+            );
+
+            /*
+              Reject the file if metadata cannot be read.
+              This is safer than accidentally allowing
+              an unknown file through.
+            */
+
+            continue;
+
+          }
+
+        }
+
+
+        /*
+          Valid file found.
+        */
+
+        return {
+          number,
+          path: fullPath
+        };
+
+      }
+
+
+      /*
+        Nothing valid was found.
+      */
+
+      throw new Error(
+        `No valid ${type} clips were found for ${config.folder}.`
+      );
+
+    }
+
+
+    /* =========================================================
        LOAD FFMPEG
     ========================================================= */
 
@@ -1528,8 +1773,11 @@
         return;
       }
 
+
       const status =
-        document.getElementById("status");
+        document.getElementById(
+          "status"
+        );
 
 
       if (!evilMode) {
@@ -1540,7 +1788,8 @@
       }
 
 
-      ffmpeg = new FFmpeg();
+      ffmpeg =
+        new FFmpeg();
 
 
       const baseURL =
@@ -1549,14 +1798,16 @@
 
       const coreURL =
         await toBlobURL(
-          baseURL + "/ffmpeg-core.js",
+          baseURL +
+          "/ffmpeg-core.js",
           "text/javascript"
         );
 
 
       const wasmURL =
         await toBlobURL(
-          baseURL + "/ffmpeg-core.wasm",
+          baseURL +
+          "/ffmpeg-core.wasm",
           "application/wasm"
         );
 
@@ -1567,10 +1818,12 @@
       });
 
 
-      ffmpegLoaded = true;
+      ffmpegLoaded =
+        true;
 
 
-      status.textContent = "";
+      status.textContent =
+        "";
 
     }
 
@@ -1587,7 +1840,8 @@
         );
 
 
-      evilSequencePosition = 0;
+      evilSequencePosition =
+        0;
 
 
       error.innerHTML =
@@ -1602,19 +1856,24 @@
         "ocked.";
 
 
-      error.style.display = "block";
+      error.style.display =
+        "block";
 
 
       error
-        .querySelectorAll(".evil-letter")
-        .forEach(letter => {
+        .querySelectorAll(
+          ".evil-letter"
+        )
+        .forEach(
+          letter => {
 
-          letter.addEventListener(
-            "click",
-            handleEvilLetter
-          );
+            letter.addEventListener(
+              "click",
+              handleEvilLetter
+            );
 
-        });
+          }
+        );
 
     }
 
@@ -1644,12 +1903,13 @@
 
       if (
         clicked ===
-        sequence[evilSequencePosition]
+        sequence[
+          evilSequencePosition
+        ]
       ) {
 
         event.target.style.color =
           "#ffffff";
-
 
         event.target.style.textShadow =
           "0 0 8px #fff, 0 0 20px #ff0000";
@@ -1667,11 +1927,14 @@
 
         }
 
+
         return;
+
       }
 
 
-      evilSequencePosition = 0;
+      evilSequencePosition =
+        0;
 
 
       event.target.animate(
@@ -1680,17 +1943,14 @@
             transform:
               "translateX(-5px)"
           },
-
           {
             transform:
               "translateX(5px)"
           },
-
           {
             transform:
               "translateX(-5px)"
           },
-
           {
             transform:
               "translateX(0)"
@@ -1716,11 +1976,16 @@
         );
 
 
-      audio.loop = true;
+      audio.loop =
+        true;
 
-      audio.currentTime = 0;
+      audio.currentTime =
+        0;
 
-      audio.play().catch(() => {});
+
+      audio.play().catch(
+        () => {}
+      );
 
     }
 
@@ -1744,9 +2009,12 @@
 
       laugh.pause();
 
-      laugh.currentTime = 0;
+      laugh.currentTime =
+        0;
 
-      laugh.play().catch(() => {});
+      laugh.play().catch(
+        () => {}
+      );
 
 
       scheduleRetepLaugh();
@@ -1802,13 +2070,18 @@
 
       errorSound.pause();
 
-      errorSound.currentTime = 0;
+      errorSound.currentTime =
+        0;
 
-      errorSound.play().catch(() => {});
+      errorSound.play().catch(
+        () => {}
+      );
 
 
       const popup =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
 
       popup.className =
@@ -1831,20 +2104,23 @@
 
       popup.style.left =
         Math.floor(
-          Math.random() * maxX
+          Math.random() *
+          maxX
         ) + "px";
 
 
       popup.style.top =
         Math.floor(
-          Math.random() * maxY
+          Math.random() *
+          maxY
         ) + "px";
 
 
       popup.style.width =
         220 +
         Math.floor(
-          Math.random() * 180
+          Math.random() *
+          180
         ) +
         "px";
 
@@ -1913,7 +2189,9 @@
         '</div>';
 
 
-      container.appendChild(popup);
+      container.appendChild(
+        popup
+      );
 
 
       const lifetime =
@@ -1991,9 +2269,12 @@
 
     function activateEvilMode() {
 
-      evilMode = true;
+      evilMode =
+        true;
 
-      currentShow = "retep";
+
+      currentShow =
+        "retep";
 
 
       document.body.className =
@@ -2007,20 +2288,24 @@
 
 
       document
-        .querySelectorAll(".char-head")
-        .forEach(img => {
+        .querySelectorAll(
+          ".char-head"
+        )
+        .forEach(
+          img => {
 
-          img.src =
-            "clips/retep/head.png";
+            img.src =
+              "clips/retep/head.png";
 
-          img.alt =
-            "RETEP";
+            img.alt =
+              "RETEP";
 
-          img.classList.add(
-            "active"
-          );
+            img.classList.add(
+              "active"
+            );
 
-        });
+          }
+        );
 
 
       document.getElementById(
@@ -2067,7 +2352,8 @@
 
       document.getElementById(
         "status"
-      ).textContent = "";
+      ).textContent =
+        "";
 
     }
 
@@ -2076,69 +2362,100 @@
        NORMAL GENERATION
     ========================================================= */
 
-    async function generateNormalVideo(config) {
+    async function generateNormalVideo(
+      config
+    ) {
 
-      // R1 is an override, rather than a probability: 1 means always; 0 means never.
-      if (config.folder === "family_guy" &&
-          rarityConfig.family_guy &&
-          rarityConfig.family_guy.rareChance === 1) {
-        console.log("Rare override enabled; playing R1.mp4.");
-        const rarePath = "clips/family_guy/rare/R1.mp4";
+      /*
+        R1 override.
+      */
+
+      if (
+        config.folder === "family_guy" &&
+        rarityConfig.family_guy &&
+        rarityConfig.family_guy.rareChance === 1
+      ) {
+
+        console.log(
+          "Rare override enabled; playing R1.mp4."
+        );
+
+
+        const rarePath =
+          "clips/family_guy/rare/R1.mp4";
+
 
         await ffmpeg.writeFile(
           "rare.mp4",
-          await fetchFile(rarePath)
+          await fetchFile(
+            rarePath
+          )
         );
+
 
         return "rare.mp4";
+
       }
 
-      // For normal videos, stitch start + end
-      const startNumber =
-        getRandomInt(
-          config.startCount
+
+      /*
+        Find a valid start clip.
+      */
+
+      const startClip =
+        await getValidRandomClip(
+          config,
+          "start"
         );
 
-      const startPath =
-        "clips/" +
-        config.folder +
-        "/start/S" +
-        startNumber +
-        ".mp4";
 
-      const endNumber =
-        getRandomInt(
-          config.endCount
+      /*
+        Find a valid end clip.
+      */
+
+      const endClip =
+        await getValidRandomClip(
+          config,
+          "end"
         );
 
-      const endPath =
-        "clips/" +
-        config.folder +
-        "/end/E" +
-        endNumber +
-        ".mp4";
 
       console.log(
         "Start clip:",
-        startPath
+        startClip.path
       );
+
 
       console.log(
         "End clip:",
-        endPath
+        endClip.path
       );
+
+
+      /*
+        Download selected clips
+        into FFmpeg.
+      */
 
       await ffmpeg.writeFile(
         "start.mp4",
-        await fetchFile(startPath)
+        await fetchFile(
+          startClip.path
+        )
       );
 
 
       await ffmpeg.writeFile(
         "end.mp4",
-        await fetchFile(endPath)
+        await fetchFile(
+          endClip.path
+        )
       );
 
+
+      /*
+        Concatenation list.
+      */
 
       await ffmpeg.writeFile(
         "inputs.txt",
@@ -2149,15 +2466,26 @@
       );
 
 
+      /*
+        Stitch the two clips.
+      */
+
       await ffmpeg.exec([
         "-f",
         "concat",
+
         "-safe",
         "0",
+
         "-i",
         "inputs.txt",
+
         "-c",
         "copy",
+
+        "-movflags",
+        "+faststart",
+
         "merged.mp4"
       ]);
 
@@ -2171,27 +2499,47 @@
        RETEP GENERATION
     ========================================================= */
 
-    async function generateRetepVideo(config) {
+    async function generateRetepVideo(
+      config
+    ) {
 
       const progressEl =
-        document.getElementById("retepProgress");
+        document.getElementById(
+          "retepProgress"
+        );
 
-      const updateProgress = (value, label = "") => {
-        progressEl.style.display = "block";
-        progressEl.textContent = label
-          ? value + "% — " + label
-          : value + "%";
+
+      const updateProgress = (
+        value,
+        label = ""
+      ) => {
+
+        progressEl.style.display =
+          "block";
+
+        progressEl.textContent =
+          label
+            ? value + "% — " + label
+            : value + "%";
+
       };
 
-      updateProgress(10, "loading start clip");
+
+      updateProgress(
+        10,
+        "loading start clip"
+      );
+
 
       const startNumber =
         getRandomInt(
           config.startCount
         );
 
+
       const startFile =
         "retep_start.mp4";
+
 
       await ffmpeg.writeFile(
         startFile,
@@ -2202,15 +2550,22 @@
         )
       );
 
-      updateProgress(40, "loading end clip");
+
+      updateProgress(
+        40,
+        "loading end clip"
+      );
+
 
       const endNumber =
         getRandomInt(
           config.endCount
         );
 
+
       const endFile =
         "retep_end.mp4";
+
 
       await ffmpeg.writeFile(
         endFile,
@@ -2221,45 +2576,74 @@
         )
       );
 
-      updateProgress(60, "normalizing clip timing");
+
+      updateProgress(
+        60,
+        "normalizing clip timing"
+      );
+
 
       await ffmpeg.exec([
         "-i",
         "retep_start.mp4",
+
         "-i",
         "retep_end.mp4",
+
         "-filter_complex",
+
         "[0:v]trim=0:2.5,setpts=PTS-STARTPTS,fps=12,scale=320:-2[v0];" +
+
         "[1:v]setpts=PTS-STARTPTS,fps=12,scale=320:-2[v1];" +
+
         "[0:a]atrim=0:2.5,asetpts=PTS-STARTPTS[a0];" +
+
         "[1:a]asetpts=PTS-STARTPTS[a1];" +
+
         "[v0][a0][v1][a1]concat=n=2:v=1:a=1[outv][outa]",
+
         "-map",
         "[outv]",
+
         "-map",
         "[outa]",
+
         "-c:v",
         "libx264",
+
         "-preset",
         "ultrafast",
+
         "-crf",
         "54",
+
         "-b:v",
         "18k",
+
         "-pix_fmt",
         "yuv420p",
+
         "-c:a",
         "aac",
+
         "-b:a",
         "8k",
+
         "-ac",
         "2",
+
         "-movflags",
         "+faststart",
+
         "retep_final.mp4"
       ]);
 
-      updateProgress(100, "finalizing");
+
+      updateProgress(
+        100,
+        "finalizing"
+      );
+
 
       return "retep_final.mp4";
 
@@ -2310,7 +2694,15 @@
         "disabled"
       );
 
-      document.getElementById("buttonContainer").classList.remove("video-visible");
+
+      document
+        .getElementById(
+          "buttonContainer"
+        )
+        .classList.remove(
+          "video-visible"
+        );
+
 
       btn.style.pointerEvents =
         "none";
@@ -2322,7 +2714,8 @@
 
         await loadFFmpeg();
 
-        /* RELOAD RARITY CONFIG FOR REAL-TIME CHANGES */
+
+        /* RELOAD RARITY CONFIG */
 
         await loadRarityConfig();
 
@@ -2334,7 +2727,8 @@
 
         if (evilMode) {
 
-          status.textContent = "";
+          status.textContent =
+            "";
 
 
           outputFile =
@@ -2350,12 +2744,16 @@
         else {
 
           status.textContent =
-            "Downloading clips...";
+            currentShow === "cleveland_show"
+              ? "Checking clips..."
+              : "Downloading clips...";
 
 
           outputFile =
             await generateNormalVideo(
-              showLibrary[currentShow]
+              showLibrary[
+                currentShow
+              ]
             );
 
         }
@@ -2363,7 +2761,8 @@
 
         /* READ OUTPUT */
 
-        status.textContent = "";
+        status.textContent =
+          "";
 
 
         const data =
@@ -2388,8 +2787,7 @@
 
 
         /*
-          Do NOT touch the current player until
-          generation has completely finished.
+          Replace previous object URL.
         */
 
         if (
@@ -2414,7 +2812,15 @@
         player.style.display =
           "block";
 
-        document.getElementById("buttonContainer").classList.add("video-visible");
+
+        document
+          .getElementById(
+            "buttonContainer"
+          )
+          .classList.add(
+            "video-visible"
+          );
+
 
         player.load();
 
@@ -2425,7 +2831,9 @@
 
           await player.play();
 
-        } catch (err) {
+        }
+
+        catch (err) {
 
           console.log(
             "Autoplay blocked.",
@@ -2435,7 +2843,8 @@
         }
 
 
-        status.textContent = "";
+        status.textContent =
+          "";
 
       }
 
@@ -2453,9 +2862,12 @@
           status.textContent =
             "Error creating video. Check the console.";
 
-        } else {
+        }
 
-          status.textContent = "";
+        else {
+
+          status.textContent =
+            "";
 
         }
 
@@ -2465,10 +2877,18 @@
       finally {
 
         const retepProgress =
-          document.getElementById("retepProgress");
+          document.getElementById(
+            "retepProgress"
+          );
 
-        retepProgress.style.display = "none";
-        retepProgress.textContent = "";
+
+        retepProgress.style.display =
+          "none";
+
+
+        retepProgress.textContent =
+          "";
+
 
         btn.classList.remove(
           "disabled"
@@ -2493,6 +2913,7 @@
 
     window.playMashup =
       playMashup;
+
 
     /* =========================================================
        INITIALIZATION

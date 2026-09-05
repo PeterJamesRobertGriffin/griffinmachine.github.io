@@ -1060,6 +1060,10 @@
 
     let evilMode = false;
 
+    // Retep generation tracking and lock (locks until full page refresh)
+    let retepGenCount = 0;
+    let retepLocked = false;
+
     let evilSequencePosition = 0;
 
     let popupTimeout = null;
@@ -1105,8 +1109,8 @@
 
       family_guy: {
         folder: "family_guy",
-        startCount: 81,
-        endCount: 99,
+        startCount: 149,
+        endCount: 169,
 
         buttonImg:
           "generate_btn_family_guy.png",
@@ -1142,7 +1146,7 @@
       retep: {
         folder: "retep",
         startCount: 81,
-        endCount: 3,
+        endCount: 6,
 
         buttonImg:
           "generate_btn_family_guy.png",
@@ -1242,6 +1246,11 @@
     ========================================================= */
 
     async function selectShow(showKey, element) {
+
+      // Prevent entering Retep if it has been locked after its final screamer
+      if (showKey === "retep" && retepLocked) {
+        return;
+      }
 
       if (evilMode) {
         return;
@@ -1976,16 +1985,14 @@
         );
 
 
-      audio.loop =
-        true;
+      // increase volume slightly depending on generation count
+      const baseVolume = 0.12;
+      const step = 0.16;
+      audio.loop = true;
+      audio.currentTime = 0;
+      audio.volume = Math.min(1, baseVolume + (retepGenCount * step));
 
-      audio.currentTime =
-        0;
-
-
-      audio.play().catch(
-        () => {}
-      );
+      audio.play().catch(() => {});
 
     }
 
@@ -2193,6 +2200,22 @@
         popup
       );
 
+      // spawn extra popups as generation count increases
+      const extra = Math.max(0, Math.floor((retepGenCount - 1) / 2));
+
+      for (let i = 0; i < extra; i++) {
+        setTimeout(() => {
+          try {
+            const clone = popup.cloneNode(true);
+            clone.style.left = Math.floor(Math.random() * Math.max(10, window.innerWidth - 290)) + "px";
+            clone.style.top = Math.floor(Math.random() * Math.max(10, window.innerHeight - 230)) + "px";
+            container.appendChild(clone);
+            setTimeout(() => clone.classList.add("removing"), 1400 + Math.floor(Math.random() * 2600));
+            setTimeout(() => clone.remove(), 2000 + Math.floor(Math.random() * 2600));
+          } catch (e) {}
+        }, 100 + i * 120);
+      }
+
 
       const lifetime =
         1400 +
@@ -2229,12 +2252,11 @@
         return;
       }
 
-
-      const delay =
-        2500 +
-        Math.floor(
-          Math.random() * 7000
-        );
+      // reduce delay as generation count increases
+      const base = 2500;
+      const variance = 7000;
+      const speedFactor = 1 + (retepGenCount * 0.6);
+      const delay = Math.max(300, Math.floor((base + Math.floor(Math.random() * variance)) / speedFactor));
 
 
       popupTimeout =
@@ -2354,6 +2376,111 @@
         "status"
       ).textContent =
         "";
+
+    }
+
+
+    /* =========================================================
+       SCREAMER
+    ========================================================= */
+
+    function showScreamer() {
+
+      try {
+        let overlay = document.getElementById('screamerOverlay');
+
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'screamerOverlay';
+          Object.assign(overlay.style, {
+            position: 'fixed',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
+            background: '#000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999
+          });
+
+          const img = document.createElement('img');
+          img.src = 'jumpscary/scream.jpg';
+          img.alt = 'scream';
+          img.style.maxWidth = '100%';
+          img.style.maxHeight = '100%';
+
+          overlay.appendChild(img);
+
+          document.body.appendChild(overlay);
+        }
+
+        // play scream audio
+        const screamAudio = new Audio('jumpscary/scream.mp3');
+        screamAudio.volume = 1.0;
+        screamAudio.play().catch(() => {});
+
+        // stop ret ep audio and scheduled callbacks
+        try {
+          clearTimeout(popupTimeout);
+          clearTimeout(laughTimeout);
+        } catch (e) {}
+
+        try {
+          const pc = document.getElementById('popupContainer');
+          while (pc && pc.firstChild) pc.removeChild(pc.firstChild);
+        } catch (e) {}
+
+        try {
+          const retepAudio = document.getElementById('retepAudio');
+          if (retepAudio) {
+            retepAudio.pause();
+            retepAudio.currentTime = 0;
+          }
+        } catch (e) {}
+
+        // After scream, reset UI back to starting state without refreshing
+        setTimeout(() => {
+          try { screamAudio.pause(); screamAudio.currentTime = 0; } catch (e) {}
+
+          try { const over = document.getElementById('screamerOverlay'); if (over) over.remove(); } catch (e) {}
+
+          evilMode = false;
+          retepLocked = true;
+
+          // return to default show
+          currentShow = 'family_guy';
+          document.body.className = 'family_guy';
+
+          // restore logos and buttons
+          try {
+            document.getElementById('siteLogo').src = showLibrary.family_guy.logo;
+            document.getElementById('generateBtn').src = showLibrary.family_guy.buttonImg;
+          } catch (e) {}
+
+          // restore heads
+          try {
+            const hf = document.getElementById('head-family');
+            const hc = document.getElementById('head-cleveland');
+            const hu = document.getElementById('head-custom');
+            if (hf) { hf.src = 'clips/family_guy/head.png'; hf.classList.add('active'); }
+            if (hc) { hc.src = 'clips/cleveland_show/head.png'; hc.classList.remove('active'); }
+            if (hu) { hu.src = 'clips/custom/head.png'; hu.classList.remove('active'); }
+          } catch (e) {}
+
+          try {
+            document.getElementById('status').textContent = '';
+            const error = document.getElementById('evilError');
+            if (error) { error.classList.remove('complete'); error.innerHTML = ''; }
+            const msg = document.getElementById('evilMessage'); if (msg) msg.style.display = 'none';
+          } catch (e) {}
+
+        }, 2200);
+
+      } catch (e) {
+        console.error('showScreamer error', e);
+      }
 
     }
 
@@ -2503,6 +2630,15 @@
       config
     ) {
 
+      // ensure we don't start generation if locked
+      if (retepLocked) {
+        console.log('generateRetepVideo aborted: retepLocked=true');
+        // signal caller by throwing so playMashup can handle gracefully
+        throw new Error('Retep is locked');
+      }
+
+      console.log('generateRetepVideo start', { retepGenCount, retepLocked });
+
       const progressEl =
         document.getElementById(
           "retepProgress"
@@ -2530,52 +2666,49 @@
         "loading start clip"
       );
 
-
-      const startNumber =
-        getRandomInt(
-          config.startCount
-        );
-
-
-      const startFile =
-        "retep_start.mp4";
-
-
-      await ffmpeg.writeFile(
-        startFile,
-        await fetchFile(
-          "clips/retep/start/S" +
-          startNumber +
-          ".mp4"
-        )
-      );
-
+      // Try multiple candidates for start clip to avoid missing files
+      const startFile = "retep_start.mp4";
+      let startNumber = null;
+      for (let attempt = 0; attempt < Math.max(3, config.startCount); attempt++) {
+        const candidate = getRandomInt(config.startCount);
+        const url = "clips/" + config.folder + "/start/S" + candidate + ".mp4";
+        try {
+          console.log('fetch start', url);
+          const data = await fetchFile(url);
+          await ffmpeg.writeFile(startFile, data);
+          startNumber = candidate;
+          break;
+        } catch (err) {
+          console.warn('start clip fetch failed', url, err && err.message);
+        }
+      }
+      if (startNumber === null) {
+        throw new Error('No valid start clip for ' + config.folder);
+      }
 
       updateProgress(
         40,
         "loading end clip"
       );
 
-
-      const endNumber =
-        getRandomInt(
-          config.endCount
-        );
-
-
-      const endFile =
-        "retep_end.mp4";
-
-
-      await ffmpeg.writeFile(
-        endFile,
-        await fetchFile(
-          "clips/retep/end/E" +
-          endNumber +
-          ".mp4"
-        )
-      );
-
+      const endFile = "retep_end.mp4";
+      let endNumber = null;
+      for (let attempt = 0; attempt < Math.max(3, config.endCount); attempt++) {
+        const candidate = getRandomInt(config.endCount);
+        const url = "clips/" + config.folder + "/end/E" + candidate + ".mp4";
+        try {
+          console.log('fetch end', url);
+          const data = await fetchFile(url);
+          await ffmpeg.writeFile(endFile, data);
+          endNumber = candidate;
+          break;
+        } catch (err) {
+          console.warn('end clip fetch failed', url, err && err.message);
+        }
+      }
+      if (endNumber === null) {
+        throw new Error('No valid end clip for ' + config.folder);
+      }
 
       updateProgress(
         60,
@@ -2710,6 +2843,16 @@
 
       try {
 
+        console.log('playMashup start', { currentShow, evilMode, retepLocked, retepGenCount });
+
+        // If Retep is selected but locked, avoid attempting generation
+        if (currentShow === 'retep' && retepLocked) {
+          status.textContent = 'Retep is locked. Refresh to re-enable.';
+          btn.classList.remove('disabled');
+          btn.style.pointerEvents = 'auto';
+          return;
+        }
+
         /* LOAD FFMPEG ONCE */
 
         await loadFFmpeg();
@@ -2736,6 +2879,8 @@
               showLibrary.retep
             );
 
+            console.log('generateRetepVideo returned', { outputFile });
+
         }
 
 
@@ -2756,6 +2901,8 @@
               ]
             );
 
+          console.log('generateNormalVideo returned', { outputFile });
+
         }
 
 
@@ -2763,6 +2910,8 @@
 
         status.textContent =
           "";
+
+        
 
 
         const data =
@@ -2843,6 +2992,35 @@
         }
 
 
+        // After successful playback, count this generation for Retep
+        if (evilMode && currentShow === "retep") {
+          retepGenCount = Math.min(5, retepGenCount + 1);
+
+          // increase audio volume step
+          try {
+            const audioEl = document.getElementById('retepAudio');
+            if (audioEl) {
+              const baseVolume = 0.12;
+              const step = 0.16;
+              audioEl.volume = Math.min(1, baseVolume + (retepGenCount * step));
+            }
+          } catch (e) {}
+
+          // spawn a few extra popups proportional to new count
+          try {
+            const times = Math.max(0, retepGenCount - 1);
+            for (let i = 0; i < times; i++) setTimeout(() => createRetepPopup(), 300 + i * 150);
+          } catch (e) {}
+
+          // If we reached the cap, show screamer and lock Retep
+          if (retepGenCount >= 5) {
+            retepLocked = true;
+            await new Promise(r => setTimeout(r, 900));
+            showScreamer();
+          }
+
+        }
+
         status.textContent =
           "";
 
@@ -2857,6 +3035,7 @@
         );
 
 
+
         if (!evilMode) {
 
           status.textContent =
@@ -2866,8 +3045,8 @@
 
         else {
 
-          status.textContent =
-            "";
+          // show useful status when evil generation fails
+          status.textContent = "Error creating Retep video. Check console.";
 
         }
 

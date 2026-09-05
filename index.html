@@ -1105,6 +1105,28 @@
 
     const REMOTE_RARITY_URL = "";
 
+    // Optional remote base URL for clips. If set (or passed as ?remote=),
+    // clip URLs will be resolved against this base instead of the local
+    // `clips/` folder. Useful for GitHub Pages where LFS objects are not served.
+    let REMOTE_CLIP_BASE = "";
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const remoteParam = params.get('remote') || params.get('remote_base');
+      if (remoteParam) {
+        REMOTE_CLIP_BASE = remoteParam;
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    function buildClipUrl(folder, subpath) {
+      if (REMOTE_CLIP_BASE) {
+        return REMOTE_CLIP_BASE.replace(/\/$/, '') + '/' + folder + '/' + subpath;
+      }
+      return 'clips/' + folder + '/' + subpath;
+    }
+
 
     /*
       Prevent multiple character transitions
@@ -1707,25 +1729,8 @@
 
       for (const number of numbers) {
 
-        const path =
-          "clips/" +
-          config.folder +
-          "/" +
-          type +
-          "/";
-
-        const filename =
-          (
-            type === "start"
-              ? "S"
-              : "E"
-          ) +
-          number +
-          ".mp4";
-
-        const fullPath =
-          path +
-          filename;
+        const filename = ((type === "start") ? "S" : "E") + number + ".mp4";
+        const fullPath = buildClipUrl(config.folder, type + '/' + filename);
 
 
         /*
@@ -2545,9 +2550,7 @@
         );
 
 
-        const rarePath =
-          "clips/family_guy/rare/R1.mp4";
-
+        const rarePath = buildClipUrl('family_guy', 'rare/R1.mp4');
 
         await ffmpeg.writeFile(
           "rare.mp4",
@@ -2718,7 +2721,7 @@
       let startNumber = null;
       for (let attempt = 0; attempt < Math.max(3, config.startCount); attempt++) {
         const candidate = getRandomInt(config.startCount);
-        const url = "clips/" + config.folder + "/start/S" + candidate + ".mp4";
+        const url = buildClipUrl(config.folder, 'start/S' + candidate + '.mp4');
         try {
           console.log('fetch start', url);
           const data = await safeFetchFile(url);
@@ -2742,7 +2745,7 @@
       let endNumber = null;
       for (let attempt = 0; attempt < Math.max(3, config.endCount); attempt++) {
         const candidate = getRandomInt(config.endCount);
-        const url = "clips/" + config.folder + "/end/E" + candidate + ".mp4";
+        const url = buildClipUrl(config.folder, 'end/E' + candidate + '.mp4');
         try {
           console.log('fetch end', url);
           const data = await safeFetchFile(url);

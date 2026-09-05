@@ -2876,18 +2876,38 @@
             'inputs.txt',
             '-c',
             'copy',
-            '-movflags',
-            '+faststart',
-            'retep_fast.mp4'
+              '-movflags',
+              '+faststart',
+              // ensure correct PTS generation and avoid negative timestamps when remuxing
+              '-fflags',
+              '+genpts',
+              '-avoid_negative_ts',
+              'make_zero',
+              '-vsync',
+              '2',
+              'retep_fast.mp4'
           ]);
 
             // If fast concat succeeded, use it
             updateProgress(95, 'finalizing (fast)');
             try {
-              // copy to final name
-              await ffmpeg.exec(['-i', 'retep_fast.mp4', '-c', 'copy', 'retep_final.mp4']);
+              // remux fast concat result with PTS/genpts flags to fix timestamp issues
+              await ffmpeg.exec([
+                '-fflags', '+genpts',
+                '-avoid_negative_ts', 'make_zero',
+                '-i', 'retep_fast.mp4',
+                '-c', 'copy',
+                '-movflags', '+faststart',
+                '-vsync', '2',
+                'retep_final.mp4'
+              ]);
             } catch (e) {
-              // ignore rename failure
+              console.warn('Remux of fast concat failed, attempting copy fallback', e && e.message);
+              try {
+                await ffmpeg.exec(['-i', 'retep_fast.mp4', '-c', 'copy', 'retep_final.mp4']);
+              } catch (e2) {
+                console.warn('Fallback copy also failed', e2 && e2.message);
+              }
             }
 
             finalFile = 'retep_final.mp4';
@@ -2950,6 +2970,10 @@
           '-i', 'inputs.txt',
           '-c', 'copy',
           '-movflags', '+faststart',
+          // ensure PTS are regenerated and timestamps normalized for concat
+          '-fflags', '+genpts',
+          '-avoid_negative_ts', 'make_zero',
+          '-vsync', '2',
           'retep_final.mp4'
         ]);
 

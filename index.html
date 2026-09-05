@@ -1108,13 +1108,18 @@
     // Optional remote base URL for clips. If set (or passed as ?remote=),
     // clip URLs will be resolved against this base instead of the local
     // `clips/` folder. Useful for GitHub Pages where LFS objects are not served.
+    // Support multiple remote zip URLs separated by comma or pipe.
+    // Example: ?remote=https://.../family.zip,https://.../retep.zip
     let REMOTE_CLIP_BASE = "";
+    let REMOTE_CLIP_BASES = [];
 
     try {
       const params = new URLSearchParams(window.location.search);
       const remoteParam = params.get('remote') || params.get('remote_base');
       if (remoteParam) {
         REMOTE_CLIP_BASE = remoteParam;
+        // split on comma or pipe and trim
+        REMOTE_CLIP_BASES = remoteParam.split(/[|,]/).map(s => s.trim()).filter(Boolean);
       }
     } catch (e) {
       // ignore
@@ -2770,9 +2775,20 @@
         "loading start clip"
       );
 
-      // If remote base is a zip archive, extract it into FFmpeg FS so files
-      // can be read directly without hitting GitHub Pages LFS pointers.
-      if (REMOTE_CLIP_BASE && REMOTE_CLIP_BASE.toLowerCase().endsWith('.zip')) {
+      // If remote base points to one or more zip archives, extract each into FFmpeg FS
+      // so files can be read directly without hitting GitHub Pages LFS pointers.
+      if (Array.isArray(REMOTE_CLIP_BASES) && REMOTE_CLIP_BASES.length) {
+        for (const url of REMOTE_CLIP_BASES) {
+          if (!url) continue;
+          if (url.toLowerCase().endsWith('.zip')) {
+            try {
+              await ensureRemoteZipExtracted(url);
+            } catch (e) {
+              console.warn('Could not extract remote clips zip:', url, e && e.message);
+            }
+          }
+        }
+      } else if (REMOTE_CLIP_BASE && REMOTE_CLIP_BASE.toLowerCase().endsWith('.zip')) {
         try {
           await ensureRemoteZipExtracted(REMOTE_CLIP_BASE);
         } catch (e) {

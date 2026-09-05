@@ -2867,6 +2867,37 @@
         );
 
         try {
+          // Diagnostic: probe input durations and sizes before concat
+          try {
+            const sData = await ffmpeg.readFile(startFile);
+            const eData = await ffmpeg.readFile(endFile);
+            console.log('Input file sizes (bytes):', { start: sData.length, end: eData.length });
+            try {
+              const sBlob = new Blob([sData], { type: 'video/mp4' });
+              const eBlob = new Blob([eData], { type: 'video/mp4' });
+              try {
+                const sUrl = URL.createObjectURL(sBlob);
+                const eUrl = URL.createObjectURL(eBlob);
+                try {
+                  const sDur = await getVideoDuration(sUrl);
+                  const eDur = await getVideoDuration(eUrl);
+                  console.log('Probed input durations (s):', { start: sDur, end: eDur });
+                } catch (pdErr) {
+                  console.warn('Could not probe input durations:', pdErr && pdErr.message);
+                } finally {
+                  URL.revokeObjectURL(sUrl);
+                  URL.revokeObjectURL(eUrl);
+                }
+              } catch (blobErr) {
+                console.warn('Could not create object URLs for input probe', blobErr && blobErr.message);
+              }
+            } catch (rdErr) {
+              console.warn('Error probing input blobs', rdErr && rdErr.message);
+            }
+          } catch (fsErr) {
+            console.warn('Could not read input files from FFmpeg FS for diagnostics', fsErr && fsErr.message);
+          }
+
           await ffmpeg.exec([
             '-f',
             'concat',

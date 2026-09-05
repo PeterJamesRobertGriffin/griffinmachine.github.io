@@ -2855,6 +2855,8 @@
         60,
         "normalizing clip timing"
       );
+      // finalFile will point to the chosen output when a fast path succeeds
+      let finalFile = null;
       // Try a fast concat copy (no re-encode). If inputs are compatible this is much faster.
       try {
         updateProgress(65, 'attempting fast concat');
@@ -2888,8 +2890,12 @@
               // ignore rename failure
             }
 
-            var finalFile = 'retep_final.mp4';
-            // fall through to validation below
+            finalFile = 'retep_final.mp4';
+            // we successfully created a final file via fast concat — skip heavy re-encode
+            console.log('Fast concat produced', finalFile);
+            updateProgress(100, 'finalizing (fast)');
+            // skip the rest of the processing
+            
 
         } catch (err) {
           console.warn('Fast concat failed, falling back to re-encode', err && err.message);
@@ -2949,30 +2955,35 @@
 
         updateProgress(95, 'finalizing (normalized concat)');
 
-        var finalFile = 'retep_final.mp4';
-        // fall through to validation below
+        finalFile = 'retep_final.mp4';
+        console.log('Normalized concat produced', finalFile);
+        updateProgress(95, 'finalizing (normalized concat)');
+        // skip the heavy filter_complex step below since we already have a valid output
+        
 
       } catch (normErr) {
         console.warn('Normalized concat attempt failed, falling back to filter_complex re-encode', normErr && normErr.message);
         // continue to the filter_complex re-encode path below
       }
 
-      // Debug: ensure the expected files are present in FFmpeg's virtual FS
-      try {
-        if (ffmpeg && ffmpeg.FS) {
-          const rootFiles = ffmpeg.FS.readdir('/');
-          console.log('FFmpeg FS root files before exec:', rootFiles);
-          if (!rootFiles.includes('retep_start.mp4') || !rootFiles.includes('retep_end.mp4')) {
-            console.error('Missing expected files in FFmpeg FS:', rootFiles);
-            throw new Error('Missing input files for ffmpeg exec');
+      // Only run the heavy filter_complex path if we haven't already produced a final file
+      if (!finalFile) {
+        // Debug: ensure the expected files are present in FFmpeg's virtual FS
+        try {
+          if (ffmpeg && ffmpeg.FS) {
+            const rootFiles = ffmpeg.FS.readdir('/');
+            console.log('FFmpeg FS root files before exec:', rootFiles);
+            if (!rootFiles.includes('retep_start.mp4') || !rootFiles.includes('retep_end.mp4')) {
+              console.error('Missing expected files in FFmpeg FS:', rootFiles);
+              throw new Error('Missing input files for ffmpeg exec');
+            }
           }
+        } catch (e) {
+          console.error('FFmpeg FS check failed', e);
+          throw e;
         }
-      } catch (e) {
-        console.error('FFmpeg FS check failed', e);
-        throw e;
-      }
 
-      await ffmpeg.exec([
+        await ffmpeg.exec([
         "-fflags",
         "+genpts",
         "-avoid_negative_ts",
@@ -3042,6 +3053,13 @@
 
         "retep_final.mp4"
       ]);
+
+        // mark finalFile as the produced output from filter_complex
+        finalFile = 'retep_final.mp4';
+
+      } else {
+        console.log('Skipping filter_complex; using existing', finalFile);
+      }
 
 
       updateProgress(

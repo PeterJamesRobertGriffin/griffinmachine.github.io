@@ -23,15 +23,21 @@ jobs:
           find clips -type f | wc -l || true
           find clips -type f | head -n 20 || true
 
-      - name: Create or update release and upload clips
+      - name: Zip clips
+        run: |
+          rm -f clips.zip || true
+          zip -r clips.zip clips || true
+          ls -lh clips.zip || true
+
+      - name: Create or update release and upload clips.zip
         uses: ncipollo/release-action@v1
         with:
           tag: clips-latest
           name: clips-latest
           files: |
-            clips/**
+            clips.zip
 
       - name: Print release base URL
         run: |
-          echo 'Release assets uploaded. Use this base URL as ?remote=''
-          echo "https://github.com/${{ github.repository }}/releases/download/clips-latest"
+          echo 'Release asset uploaded. Use this base URL as ?remote=''
+          echo "https://github.com/${{ github.repository }}/releases/download/clips-latest/clips.zip"

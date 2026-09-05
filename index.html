@@ -220,7 +220,7 @@
 
       gap: 20px;
       margin: 0;
-      z-index: 15;
+      z-index: 60;
       pointer-events: none;
     }
 
@@ -232,6 +232,9 @@
       object-fit: cover;
       cursor: pointer;
       pointer-events: auto;
+
+      position: relative;
+      z-index: 70;
 
       border: 1px solid rgba(0, 0, 0, 0.45);
       background: rgba(20, 20, 20, 0.083);
@@ -3351,6 +3354,30 @@
         }
       } catch (e) {}
 
+    })();
+
+    // Ensure clicks work even if overlays cover elements: add robust listeners
+    (function() {
+      try {
+        const map = {
+          'head-family': 'family_guy',
+          'head-cleveland': 'cleveland_show',
+          'head-custom': 'custom'
+        };
+
+        document.querySelectorAll('.char-head').forEach(el => {
+          el.addEventListener('click', (e) => {
+            try {
+              e.stopPropagation();
+              const showKey = map[el.id] || el.dataset.show || 'family_guy';
+              console.log('char-head clicked:', el.id, '->', showKey);
+              selectShow(showKey, el);
+            } catch (err) {
+              console.error('char-head listener error', err);
+            }
+          }, { passive: true });
+        });
+      } catch (e) { console.warn('char-head listener init failed', e); }
     })();
 
     // Defensive cleanup: remove any stray text nodes that look like

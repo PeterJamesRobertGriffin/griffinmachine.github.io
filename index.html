@@ -1127,6 +1127,60 @@
       return 'clips/' + folder + '/' + subpath;
     }
 
+    // If REMOTE_CLIP_BASE points to a zip archive, provide a way to fetch
+    // and extract it into ffmpeg's FS so subsequent fetches can read files
+    // directly from the virtual FS. This avoids many network requests and
+    // circumvents Git LFS pointer issues on Pages.
+    let _remoteZipExtracted = false;
+    async function ensureRemoteZipExtracted(url) {
+      if (_remoteZipExtracted) return;
+      if (!url) return;
+
+      // load JSZip if needed
+      if (typeof window.JSZip === 'undefined') {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      const status = document.getElementById('status');
+      try {
+        if (status) status.textContent = 'Downloading clips archive...';
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error('Could not download clips archive: ' + resp.status);
+        const ab = await resp.arrayBuffer();
+
+        if (status) status.textContent = 'Extracting clips...';
+
+        const zip = await window.JSZip.loadAsync(ab);
+        const entries = Object.keys(zip.files);
+        for (const name of entries) {
+          const file = zip.files[name];
+          if (file.dir) continue;
+          // Only extract files under clips/
+          if (!name.startsWith('clips/')) continue;
+          const data = await file.async('uint8array');
+          try {
+            await ffmpeg.writeFile(name, data);
+          } catch (e) {
+            // ignore write errors
+            console.warn('Could not write extracted file to FFmpeg FS:', name, e && e.message);
+          }
+        }
+
+        _remoteZipExtracted = true;
+        if (status) status.textContent = '';
+      } catch (e) {
+        console.error('Failed to extract remote clips zip', e);
+        if (status) status.textContent = 'Failed to download clips archive';
+        throw e;
+      }
+    }
+
 
     /*
       Prevent multiple character transitions
@@ -2716,6 +2770,16 @@
         "loading start clip"
       );
 
+      // If remote base is a zip archive, extract it into FFmpeg FS so files
+      // can be read directly without hitting GitHub Pages LFS pointers.
+      if (REMOTE_CLIP_BASE && REMOTE_CLIP_BASE.toLowerCase().endsWith('.zip')) {
+        try {
+          await ensureRemoteZipExtracted(REMOTE_CLIP_BASE);
+        } catch (e) {
+          console.warn('Could not extract remote clips zip:', e && e.message);
+        }
+      }
+
       // Try multiple candidates for start clip to avoid missing files
       const startFile = "retep_start.mp4";
       let startNumber = null;
@@ -2724,6 +2788,20 @@
         const url = buildClipUrl(config.folder, 'start/S' + candidate + '.mp4');
         try {
           console.log('fetch start', url);
+
+          // If we extracted a remote zip, prefer the file from FFmpeg FS
+          const internalPath = 'clips/' + config.folder + '/start/S' + candidate + '.mp4';
+          if (_remoteZipExtracted) {
+            try {
+              const existing = ffmpeg.FS.readFile(internalPath);
+              await ffmpeg.writeFile(startFile, existing);
+              startNumber = candidate;
+              break;
+            } catch (e) {
+              // not present, fall back to network
+            }
+          }
+
           const data = await safeFetchFile(url);
           await ffmpeg.writeFile(startFile, data);
           startNumber = candidate;
@@ -2748,6 +2826,19 @@
         const url = buildClipUrl(config.folder, 'end/E' + candidate + '.mp4');
         try {
           console.log('fetch end', url);
+
+          const internalPath = 'clips/' + config.folder + '/end/E' + candidate + '.mp4';
+          if (_remoteZipExtracted) {
+            try {
+              const existing = ffmpeg.FS.readFile(internalPath);
+              await ffmpeg.writeFile(endFile, existing);
+              endNumber = candidate;
+              break;
+            } catch (e) {
+              // not present, fall back to network
+            }
+          }
+
           const data = await safeFetchFile(url);
           await ffmpeg.writeFile(endFile, data);
           endNumber = candidate;

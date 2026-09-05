@@ -1,0 +1,37 @@
+name: Publish Clips as Release Assets
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (with LFS)
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Show clips summary
+        run: |
+          echo 'Clips count and sample files:'
+          find clips -type f | wc -l || true
+          find clips -type f | head -n 20 || true
+
+      - name: Create or update release and upload clips
+        uses: ncipollo/release-action@v1
+        with:
+          tag: clips-latest
+          name: clips-latest
+          files: |
+            clips/**
+
+      - name: Print release base URL
+        run: |
+          echo 'Release assets uploaded. Use this base URL as ?remote=''
+          echo "https://github.com/${{ github.repository }}/releases/download/clips-latest"

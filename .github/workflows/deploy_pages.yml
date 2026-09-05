@@ -21,6 +21,26 @@ jobs:
           lfs: true
           fetch-depth: 0
 
+      - name: Diagnostics: git / LFS status
+        run: |
+          echo '--- git status ---'
+          git status --porcelain --untracked-files=no || true
+          echo '--- git rev ---'
+          git rev-parse --abbrev-ref HEAD || true
+          echo '--- git lfs ls-files (top 200) ---'
+          git lfs ls-files | head -n 200 || true
+          echo '--- grep for LFS pointers in clips ---'
+          grep -R --line-number "version https://git-lfs.github.com" clips || true
+          echo '--- show .gitattributes ---'
+          cat .gitattributes || true
+
+      - name: Diagnostics: disk & sizes
+        run: |
+          echo '--- du repo size ---'
+          du -sh . || true
+          echo '--- top large files in clips ---'
+          find clips -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 50 || true
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1
         with:

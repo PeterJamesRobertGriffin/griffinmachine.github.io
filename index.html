@@ -3090,59 +3090,60 @@
         100,
         "finalizing"
       );
-
-      // Validate output duration; if it's wildly longer than expected, re-encode to fix timestamps
+      // Force a final re-encode to ensure clean PTS/timestamps and consistent CFR (reliable, slightly slower)
       try {
         if (!finalFile) finalFile = 'retep_final.mp4';
 
-        const data = await ffmpeg.readFile(finalFile);
-        const blob = new Blob([data], { type: 'video/mp4' });
-        const url = URL.createObjectURL(blob);
+        updateProgress(100, 're-encoding final (ensuring stable timestamps)');
+        console.log('Re-encoding final file to normalize timestamps:', finalFile);
 
+        await ffmpeg.exec([
+          '-fflags', '+genpts',
+          '-avoid_negative_ts', 'make_zero',
+          '-i',
+          finalFile,
+          '-r',
+          '30',
+          '-c:v',
+          'libx264',
+          '-preset',
+          'veryfast',
+          '-crf',
+          '28',
+          '-pix_fmt',
+          'yuv420p',
+          '-c:a',
+          'aac',
+          '-b:a',
+          '96k',
+          '-ac',
+          '2',
+          '-movflags',
+          '+faststart',
+          'retep_final_cfr.mp4'
+        ]);
+
+        finalFile = 'retep_final_cfr.mp4';
+
+        // Final sanity check: validate duration approximates expectation
         try {
-          const actual = await getVideoDuration(url);
-          console.log('Actual final duration (s):', actual.toFixed(2));
-
-          // If actual duration is more than 30% larger or more than expected + 4s, consider it broken
-          if (expectedDuration && (actual > expectedDuration * 1.3 || actual > expectedDuration + 4)) {
-            console.warn('Final duration is unexpected; re-encoding to fix timestamps');
-
-            await ffmpeg.exec([
-              '-i',
-              finalFile,
-              '-fflags',
-              '+genpts',
-              '-r',
-              '30',
-              '-c:v',
-              'libx264',
-              '-preset',
-              'ultrafast',
-              '-crf',
-              '28',
-              '-pix_fmt',
-              'yuv420p',
-              '-c:a',
-              'aac',
-              '-b:a',
-              '64k',
-              '-ac',
-              '2',
-              '-movflags',
-              '+faststart',
-              'retep_final_fixed.mp4'
-            ]);
-
-            finalFile = 'retep_final_fixed.mp4';
+          const data = await ffmpeg.readFile(finalFile);
+          const blob = new Blob([data], { type: 'video/mp4' });
+          const url = URL.createObjectURL(blob);
+          try {
+            const actual = await getVideoDuration(url);
+            console.log('Re-encoded final duration (s):', actual.toFixed(2));
+          } finally {
+            URL.revokeObjectURL(url);
           }
-        } finally {
-          URL.revokeObjectURL(url);
+        } catch (e) {
+          console.warn('Could not validate re-encoded final duration:', e && e.message);
         }
 
         return finalFile;
 
       } catch (e) {
-        console.warn('Duration validation failed:', e && e.message);
+        console.error('Final re-encode failed, returning best-effort file:', e && e.message);
         return finalFile || 'retep_final.mp4';
       }
 

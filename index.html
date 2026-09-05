@@ -1056,6 +1056,23 @@
       toBlobURL
     } from "./ffmpeg/util/index.js";
 
+    // Wrap fetchFile to detect Git LFS pointer files (common cause on GitHub Pages)
+    async function safeFetchFile(url) {
+      const data = await fetchFile(url);
+
+      try {
+        // Check if the response is actually a Git LFS pointer (text file)
+        const header = new TextDecoder().decode(data.slice(0, 64));
+        if (header.includes('git-lfs.github.com') || header.includes('version https://git-lfs.github.com')) {
+          throw new Error(`File appears to be a Git LFS pointer (not the real media). GitHub Pages does not serve LFS objects. URL: ${url}`);
+        }
+      } catch (e) {
+        // If decoding fails, ignore and return raw data
+      }
+
+      return data;
+    }
+
 
     /* =========================================================
        GLOBAL STATE
@@ -2534,7 +2551,7 @@
 
         await ffmpeg.writeFile(
           "rare.mp4",
-          await fetchFile(
+          await safeFetchFile(
             rarePath
           )
         );
@@ -2596,7 +2613,7 @@
 
       await ffmpeg.writeFile(
         "start.mp4",
-        await fetchFile(
+        await safeFetchFile(
           startClip.path
         )
       );
@@ -2604,7 +2621,7 @@
 
       await ffmpeg.writeFile(
         "end.mp4",
-        await fetchFile(
+        await safeFetchFile(
           endClip.path
         )
       );
@@ -2704,7 +2721,7 @@
         const url = "clips/" + config.folder + "/start/S" + candidate + ".mp4";
         try {
           console.log('fetch start', url);
-          const data = await fetchFile(url);
+          const data = await safeFetchFile(url);
           await ffmpeg.writeFile(startFile, data);
           startNumber = candidate;
           break;
@@ -2728,7 +2745,7 @@
         const url = "clips/" + config.folder + "/end/E" + candidate + ".mp4";
         try {
           console.log('fetch end', url);
-          const data = await fetchFile(url);
+          const data = await safeFetchFile(url);
           await ffmpeg.writeFile(endFile, data);
           endNumber = candidate;
           break;
